@@ -1,9 +1,31 @@
 import "../global.css";
+import { Settings2 } from 'lucide-react';
 
 export const Popup = () => {
+
+  const openOptionsPage = () => {
+    if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage()
+    }
+  };
+
+
   return (
-    <div className="text-5xl p-10 font-extrabold">
-      <div>This is your popup.</div>
-    </div>
+    <header>
+      <div>
+        <div><img src="/src/chrome-extension/public/32.png" alt="" /></div>
+        <div><h4>FloodWatch</h4></div>
+      </div>
+
+      <ul>
+        <li>
+          <Settings2
+            size={20}
+            className='cursor-pointer'
+            onClick={openOptionsPage}
+          />
+        </li>
+      </ul>
+    </header>
   );
 };
