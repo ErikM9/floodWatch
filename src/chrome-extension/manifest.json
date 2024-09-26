@@ -1,16 +1,24 @@
 {
-    "manifest_version": 3,
-    "name": "Chrome Extension Starter",
-    "version": "1.0.0",
-    "action" : {
-      "default_popup": "popup.html"
+  "manifest_version": 3,
+  "name": "Flood Alert Extension",
+  "version": "1.0.0",
+  "description": "Alerts users to floods in their area using the Flood Monitoring API.",
+  "action": {
+    "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  "description": "This is the description of your extension",
+  "background": {
+    "service_worker": "background.js"  // background service worker
+  },
+  "permissions": [
+    "alarms",       // schedule periodic tasks (check for floods)
+    "storage",      // store user preferences for notifications
+    "notifications" // display flood alerts as notifications
+  ],
   "icons": {
     "16": "public/16.png",
     "32": "public/32.png",
     "48": "public/48.png",
     "192": "public/192.png"
   }
-  }
+}
