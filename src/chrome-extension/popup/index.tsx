@@ -11,14 +11,14 @@ export const Popup = () => {
 
 
   return (
-    <header>
-      <div>
-        <div><img src="/src/chrome-extension/public/32.png" alt="" /></div>
-        <div><h4>FloodWatch</h4></div>
+    <header className='flex flex-row justify-between px-2 pt-2'>
+      <div className='flex flex-row'>
+        <div><img src="public/32.png" className="w-10 h-10" alt="FloodWatch icon" /></div>
+        <div className='flex justify-center items-center'><h4 className='text-2xl font-bold text-blue-700 px-3 '>FloodWatch</h4></div>
       </div>
 
       <ul>
-        <li>
+        <li className='pt-2'>
           <Settings2
             size={20}
             className='cursor-pointer'
