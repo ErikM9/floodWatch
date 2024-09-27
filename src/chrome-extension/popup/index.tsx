@@ -11,7 +11,7 @@ export const Popup = () => {
   };
 
   return (
-    <header className='flex flex-row justify-between px-2 pt-2'>
+    <header className='flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl'>
       <div className='flex flex-row'>
         <div>
           <img src={logoImage} className="w-10" alt="FloodWatch icon" />
