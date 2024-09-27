@@ -26,8 +26,8 @@ const Options = () => {
         </ul>
       </header>
       <section className='mx-16'>
-        <div className='bg-slate-400'>
-          <h1>Hello</h1>
+        <div>
+          <h1>Test</h1>
         </div>
       </section>
 
