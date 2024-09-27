@@ -9,5 +9,15 @@
   "description": "This is the description of your extension",
   "icons": {
     "32": "public/32.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/chrome-extension/public/logo.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
 }
