@@ -3,8 +3,6 @@ export type GeocodingLocation = {
   longitude: number;
 }
 
-const address = 'Starbucks Coffee, 112-116 New Oxford St, London WC1A 1HH, United Kingdom'
-
 export async function userAddress(address: string): Promise<GeocodingLocation | null> {
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
 

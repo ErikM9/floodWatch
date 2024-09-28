@@ -6,7 +6,7 @@
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  "description": "This is the description of your extension",
+  "description": "This extension alerts UK based users about floods based on their location.",
   "icons": {
     "32": "public/32.png"
   },
@@ -19,5 +19,8 @@
         "<all_urls>"
       ]
     }
+  ],
+  "permissions": [
+    "geolocation"
   ]
 }
