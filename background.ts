@@ -5,16 +5,28 @@ const FLOOD_API_URL = 'https://environment.data.gov.uk/flood-monitoring/id/flood
 // user geolocation
 function getLocation(): Promise<{ lat: number; lon: number }> {
   return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude: lat, longitude: lon } = position.coords;
-        resolve({ lat, lon });
-      },
-      (error) => {
-        console.error('Error fetching geolocation:', error);
-        reject('Unable to access your location.');
+    chrome.storage.local.get(['lat', 'lon'], (result) => {
+      if (result.lat && result.lon) {
+        console.log('Location found in storage', result);
+        resolve({ lat: result.lat, lon: result.lon })
+      } else {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude: lat, longitude: lon } = position.coords;
+            console.log('location retrieved from geolocation:', { lat, lon })
+
+            chrome.storage.local.set({ lat, lon }, () => {
+              console.log('Location saved in storage:', { lat, lon });
+            })
+            resolve({ lat, lon });
+          },
+          (error) => {
+            console.error('Error fetching geolocation:', error);
+            reject('Unable to access your location.');
+          }
+        );
       }
-    );
+    })
   });
 }
 
@@ -76,7 +88,7 @@ async function checkForFloods() {
         if (polygonData && isWithinPolygon(userLocation, polygonData)) {
           localFloods.push(flood);
         }
-      } 
+      }
       // fallback to proximity check based on lat/lon
       else if (floodArea && floodArea.lat && floodArea.lon && isNearby(userLocation.lat, userLocation.lon, floodArea.lat, floodArea.lon)) {
         localFloods.push(flood);

@@ -21,6 +21,9 @@
     }
   ],
   "permissions": [
-    "geolocation"
+    "geolocation",
+    "storage",
+    "notification",
+    "alarms"
   ]
 }
