@@ -4,7 +4,7 @@ export type GeocodingLocation = {
 }
 
 export async function userAddress(address: string): Promise<GeocodingLocation | null> {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=gb`;
 
   try {
     const response = await fetch(url);
