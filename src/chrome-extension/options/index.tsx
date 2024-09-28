@@ -2,7 +2,9 @@ import "../global.css";
 import { Mail } from 'lucide-react';
 import logoImage from './../public/logo.png'
 
+
 const Options = () => {
+
   return (
 
     <div>
