@@ -23,7 +23,7 @@
   "permissions": [
     "geolocation",
     "storage",
-    "notification",
+    "notifications",
     "alarms"
   ]
 }
