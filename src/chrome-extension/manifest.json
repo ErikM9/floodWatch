@@ -24,6 +24,7 @@
     "geolocation",
     "storage",
     "notifications",
-    "alarms"
+    "alarms",
+    "storage"
   ]
 }

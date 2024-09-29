@@ -4,7 +4,6 @@ import logoImage from './../public/logo.png'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -17,6 +16,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { userAddress } from '@/api/geocoding';
+import Map from '@/app-components/Map';
+import { LatLngTuple } from 'leaflet';
+import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
   address: z.string().min(5, {
@@ -25,21 +27,56 @@ const formSchema = z.object({
 })
 
 const Options = () => {
+  const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       address: "",
     },
-  })
+  });
 
-  const onSubmit = async (data) => {
+  useEffect(() => {
+    const loadSavedLocation = async () => {
+      let savedLocation: LatLngTuple | null = null;
+
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        try {
+          const result = await chrome.storage.local.get(['userLocation']);
+          savedLocation = result.userLocation;
+        } catch (error) {
+          console.error('Error loading saved location from Chrome storage:', error);
+        }
+      } else {
+        const localStorageLocation = localStorage.getItem('userLocation');
+        if (localStorageLocation) {
+          savedLocation = JSON.parse(localStorageLocation);
+        }
+      }
+
+      if (savedLocation) {
+        console.log('Loaded saved location:', savedLocation);
+        setUserLocation(savedLocation);
+      }
+    };
+
+    loadSavedLocation();
+  }, []);
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log('Form data:', data);
     const location = await userAddress(data.address);
 
     if (location) {
+      const newLocation: LatLngTuple = [location.latitude, location.longitude]
       console.log(`Latitude: ${location.latitude}, Longitude: ${location.longitude}`)
+      setUserLocation(newLocation);
+
+      chrome.storage.local.set({ userLocation: newLocation }, () => {
+        console.log('location saved to chrome storage');
+      })
     } else {
-      console.log('Geocoding failed or no results found')
+      console.log('Geocoding failed or no results found');
     }
   };
 
@@ -66,6 +103,9 @@ const Options = () => {
         </ul>
       </header>
       <section className='mx-16'>
+        <div>
+          <Map userLocation={userLocation} />
+        </div>
         <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
