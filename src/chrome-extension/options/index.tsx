@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { userAddress } from '@/api/geocoding';
-import Map from '@/app-components/Map';
+import UkMap from '@/app-components/Map';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 
@@ -68,17 +68,27 @@ const Options = () => {
     const location = await userAddress(data.address);
 
     if (location) {
-      const newLocation: LatLngTuple = [location.latitude, location.longitude]
-      console.log(`Latitude: ${location.latitude}, Longitude: ${location.longitude}`)
-      setUserLocation(newLocation);
+      // Ensure latitude and longitude are parsed as numbers
+      const userLocation = {
+        lat: Number(location.latitude), // Convert to number using Number()
+        lon: Number(location.longitude), // Convert to number using Number()
+      };
 
-      chrome.storage.local.set({ userLocation: newLocation }, () => {
-        console.log('location saved to chrome storage');
-      })
+      console.log(`Latitude: ${userLocation.lat}, Longitude: ${userLocation.lon}`);
+      setUserLocation([userLocation.lat, userLocation.lon]); // Set state for the map
+
+      // Save the user location as an object in Chrome storage
+      chrome.storage.local.set({ userLocation }, () => {
+        console.log('Location saved to Chrome storage:', userLocation);
+      });
+
+      // Optionally, you can check for floods here if you want to trigger it immediately after form submission
+      chrome.runtime.sendMessage({ type: 'userLocation', ...userLocation }); // Send location to background
     } else {
       console.log('Geocoding failed or no results found');
     }
   };
+
 
   return (
 
@@ -104,7 +114,7 @@ const Options = () => {
       </header>
       <section className='mx-16'>
         <div>
-          <Map userLocation={userLocation} />
+          <UkMap userLocation={userLocation} />
         </div>
         <div>
           <Form {...form}>
