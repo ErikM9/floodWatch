@@ -15,8 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { userAddress } from '@/api/geocoding';
-import UkMap from '@/app-components/Map';
+import { userAddress } from '@/chrome-extension/api/geocoding';
+import UkMap from '@/chrome-extension/app-components/Map';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 
