@@ -47,48 +47,320 @@
 // };
 
 // export default Map;
+
+// import { useEffect, useState } from 'react';
+// import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+// import 'leaflet/dist/leaflet.css';
+// import fetchFloodData from '../api/ukFloodAPI';
+
+// interface GeoJSONFeature {
+//   type: string;
+//   geometry: {
+//     type: string;
+//     coordinates: number[][][][];
+//   };
+//   properties: {
+//     AREA: string;
+//     TA_NAME: string;
+//     DESCRIP: string;
+//     LA_NAME: string;
+//     RIVER_SEA: string;
+//   };
+// }
+
+// interface GeoJSONFeatureCollection {
+//   type: "FeatureCollection";
+//   features: GeoJSONFeature[];
+// }
+
+// const UkMap = () => {
+//   const [geoJsonData, setGeoJsonData] = useState<GeoJSONFeatureCollection | null>(null);
+
+//   useEffect(() => {
+//     const loadPolygons = async () => {
+//       try {
+//         const polygonData = await fetchFloodData();
+//         console.log("Raw flood data:", JSON.stringify(polygonData, null, 2));
+
+//         const geoJson: GeoJSONFeatureCollection = {
+//           type: "FeatureCollection",
+//           features: polygonData.map((polygon: any, polygonIndex: number) => {
+//             console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
+
+//             return {
+//               type: "Feature",
+//               geometry: {
+//                 type: "MultiPolygon",
+//                 coordinates: polygon.map((p: any, pIndex: number) => {
+//                   console.log(`Processing p ${pIndex} in polygon ${polygonIndex}:`, JSON.stringify(p, null, 2));
+
+//                   if (!p.coordinates) {
+//                     console.error(`Missing coordinates in p ${pIndex} of polygon ${polygonIndex}`);
+//                     return [];
+//                   }
+
+//                   return p.coordinates.map((coordSet: any, coordSetIndex: number) => {
+//                     console.log(`Processing coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
+
+//                     // Handle different potential structures
+//                     if (Array.isArray(coordSet) && coordSet.every(point => Array.isArray(point) && point.length === 2)) {
+//                       return coordSet;
+//                     } else if (Array.isArray(coordSet)) {
+//                       return coordSet.map((point: any) => {
+//                         if (Array.isArray(point) && point.length === 2) {
+//                           return point;
+//                         } else {
+//                           console.error(`Invalid point in coordSet ${coordSetIndex} of p ${pIndex} in polygon ${polygonIndex}:`, point);
+//                           return null;
+//                         }
+//                       }).filter(Boolean);
+//                     } else {
+//                       console.error(`Invalid coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, coordSet);
+//                       return [];
+//                     }
+//                   });
+//                 }),
+//               },
+//               properties: {
+//                 AREA: polygon[0]?.AREA || "",
+//                 TA_NAME: polygon[0]?.TA_NAME || "",
+//                 DESCRIP: polygon[0]?.DESCRIP || "",
+//                 LA_NAME: polygon[0]?.LA_NAME || "",
+//                 RIVER_SEA: polygon[0]?.RIVER_SEA || "",
+//               }
+//             };
+//           })
+//         };
+
+//         console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
+//         setGeoJsonData(geoJson);
+//       } catch (error) {
+//         console.error('Error fetching or processing polygon data:', error);
+//       }
+//     };
+
+//     loadPolygons();
+//   }, []);
+
+//   return (
+//     <MapContainer center={[51.6, -1.1]} zoom={10} style={{ height: "400px", width: "100%" }}>
+//       <TileLayer
+//         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+//         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//       />
+//       {geoJsonData && (
+//         <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
+//       )}
+//     </MapContainer>
+//   );
+// }
+
+// export default UkMap;
+
+
+// import { useEffect, useState } from 'react';
+// import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+// import 'leaflet/dist/leaflet.css';
+// import fetchFloodData from '../api/ukFloodAPI';
+
+// interface GeoJSONFeature {
+//   type: string;
+//   geometry: {
+//     type: string;
+//     coordinates: number[][][][];
+//   };
+//   properties: {
+//     AREA: string;
+//     TA_NAME: string;
+//     DESCRIP: string;
+//     LA_NAME: string;
+//     RIVER_SEA: string;
+//   };
+// }
+
+// interface GeoJSONFeatureCollection {
+//   type: "FeatureCollection";
+//   features: GeoJSONFeature[];
+// }
+
+// const UkMap = () => {
+//   const [geoJsonData, setGeoJsonData] = useState<GeoJSONFeatureCollection | null>(null);
+
+//   useEffect(() => {
+//     const loadPolygons = async () => {
+//       try {
+//         const rawData = await fetchFloodData();
+//         console.log("Raw flood data:", JSON.stringify(rawData, null, 2));
+
+//         const geoJson: GeoJSONFeatureCollection = {
+//           type: "FeatureCollection",
+//           features: rawData.map((polygon: any, polygonIndex: number) => {
+//             console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
+
+//             let coordinates: number[][][][] = [];
+
+//             if (Array.isArray(polygon)) {
+//               coordinates = polygon.map((p: any) => {
+//                 if (p.coordinates && Array.isArray(p.coordinates)) {
+//                   return p.coordinates.map((coordSet: any) => {
+//                     if (Array.isArray(coordSet) && coordSet.every((point: any) => Array.isArray(point) && point.length === 2)) {
+//                       return coordSet;
+//                     } else {
+//                       console.error(`Invalid coordinate set in polygon ${polygonIndex}:`, coordSet);
+//                       return [];
+//                     }
+//                   });
+//                 } else {
+//                   console.error(`Missing or invalid coordinates in polygon ${polygonIndex}:`, p);
+//                   return [];
+//                 }
+//               });
+//             } else {
+//               console.error(`Invalid polygon data structure at index ${polygonIndex}:`, polygon);
+//             }
+
+//             return {
+//               type: "Feature",
+//               geometry: {
+//                 type: "MultiPolygon",
+//                 coordinates: coordinates,
+//               },
+//               properties: {
+//                 AREA: polygon[0]?.AREA || "",
+//                 TA_NAME: polygon[0]?.TA_NAME || "",
+//                 DESCRIP: polygon[0]?.DESCRIP || "",
+//                 LA_NAME: polygon[0]?.LA_NAME || "",
+//                 RIVER_SEA: polygon[0]?.RIVER_SEA || "",
+//               }
+//             };
+//           })
+//         };
+
+//         console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
+//         setGeoJsonData(geoJson);
+//       } catch (error) {
+//         console.error('Error fetching or processing polygon data:', error);
+//       }
+//     };
+
+//     loadPolygons();
+//   }, []);
+
+//   return (
+//     <MapContainer center={[51.6, -1.1]} zoom={10} style={{ height: "400px", width: "100%" }}>
+//       <TileLayer
+//         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+//         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//       />
+//       {geoJsonData && geoJsonData.features.length > 0 && (
+//         <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
+//       )}
+//     </MapContainer>
+//   );
+// }
+
+// export default UkMap;
+
+
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { LatLngTuple } from 'leaflet';
+import fetchFloodData from '../api/ukFloodAPI';
 
-interface PolygonData {
-  id: string;
-  latLngs: LatLngTuple[][];
+interface GeoJSONFeature {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: number[][][];
+  };
+  properties: {
+    AREA: string;
+    TA_NAME: string;
+    DESCRIP: string;
+    LA_NAME: string;
+    RIVER_SEA: string;
+  };
 }
 
-interface MapProps {
-  userLocation: LatLngTuple | null;
+interface GeoJSONFeatureCollection {
+  type: "FeatureCollection";
+  features: GeoJSONFeature[];
 }
 
-const UkMap: React.FC<MapProps> = ({ userLocation }) => {
-  const [polygons, setPolygons] = useState<PolygonData[]>([]);
+const UkMap = () => {
+  const [geoJsonData, setGeoJsonData] = useState<GeoJSONFeatureCollection | null>(null);
 
   useEffect(() => {
-    // Listen for polygon data from content script
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === 'polygonData') {
-        setPolygons(message.polygons);
+    const loadPolygons = async () => {
+      try {
+        const polygonData = await fetchFloodData();
+        console.log("Raw flood data:", JSON.stringify(polygonData, null, 2));
+
+        const geoJson: GeoJSONFeatureCollection = {
+          type: "FeatureCollection",
+          features: polygonData.map((polygon: any, polygonIndex: number) => {
+            console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
+
+            return {
+              type: "Feature",
+              geometry: {
+                type: "MultiPolygon",
+                coordinates: polygon.map((p: any, pIndex: number) => {
+                  console.log(`Processing p ${pIndex} in polygon ${polygonIndex}:`, JSON.stringify(p, null, 2));
+
+                  if (!p.coordinates) {
+                    console.error(`Missing coordinates in p ${pIndex} of polygon ${polygonIndex}`);
+                    return [];
+                  }
+
+
+                  const validCoords = p.coordinates.map((coordSet: any, coordSetIndex: number) => {
+                    console.log(`Processing coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
+
+
+                    const coords = Array.isArray(coordSet[0]) ? coordSet[0] : coordSet;
+
+
+                    return coords.filter((point: any) => {
+                      return Array.isArray(point) && point.length === 2 && !isNaN(point[0]) && !isNaN(point[1]);
+                    });
+                  });
+
+                  return validCoords;
+                }),
+              },
+              properties: {
+                AREA: polygon[0]?.AREA || "",
+                TA_NAME: polygon[0]?.TA_NAME || "",
+                DESCRIP: polygon[0]?.DESCRIP || "",
+                LA_NAME: polygon[0]?.LA_NAME || "",
+                RIVER_SEA: polygon[0]?.RIVER_SEA || "",
+              }
+            };
+          })
+        };
+
+        console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
+        setGeoJsonData(geoJson);
+      } catch (error) {
+        console.error('Error fetching or processing polygon data:', error);
       }
-    });
+    };
+
+    loadPolygons();
   }, []);
 
   return (
-    <MapContainer center={userLocation || [54.0, -2.0]} zoom={6} style={{ height: '100vh' }}>
+    <MapContainer center={[51.6, -1.1]} zoom={10} style={{ height: "400px", width: "100%" }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {userLocation && (
-        <Marker position={userLocation}>
-          {/* Optional: Add a popup to the marker */}
-        </Marker>
+      {geoJsonData && (
+        <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
       )}
-      {polygons.map((polygon) => (
-        <Polygon key={polygon.id} positions={polygon.latLngs} color="blue" />
-      ))}
     </MapContainer>
   );
-};
+}
 
 export default UkMap;
