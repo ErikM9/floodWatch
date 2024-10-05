@@ -1,3 +1,5 @@
+
+
 interface PolygonData {
   type: string;
   features: Array<{
@@ -104,4 +106,5 @@ export function processPolygons(polygonData: any): GeoJSONFeatureCollection {
   };
 }
 
-// TODO work with the data from validcoors for turf.js
+
+

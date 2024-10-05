@@ -15,10 +15,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-// import { userAddress } from '@/chrome-extension/api/geocoding';
+import { userAddress } from '@/chrome-extension/api/geocoding';
 import UkMap from '@/chrome-extension/app-components/Map';
 import { LatLngTuple } from 'leaflet';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
   address: z.string().min(5, {
@@ -27,7 +27,7 @@ const formSchema = z.object({
 })
 
 const Options = () => {
-  // const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
+  const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,38 +56,38 @@ const Options = () => {
 
       if (savedLocation) {
         console.log('Loaded saved location:', savedLocation);
-        // setUserLocation(savedLocation);
+        setUserLocation(savedLocation);
       }
     };
 
     loadSavedLocation();
   }, []);
 
-  // const onSubmit = async (data: z.infer<typeof formSchema>) => {
-  //   console.log('Form data:', data);
-  //   const location = await userAddress(data.address);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log('Form data:', data);
+    const location = await userAddress(data.address);
 
-  //   if (location) {
-  //     // Ensure latitude and longitude are parsed as numbers
-  //     const userLocation = {
-  //       lat: Number(location.latitude), // Convert to number using Number()
-  //       lon: Number(location.longitude), // Convert to number using Number()
-  //     };
+    if (location) {
+      // Ensure latitude and longitude are parsed as numbers
+      const userLocation = {
+        lat: Number(location.latitude), // Convert to number using Number()
+        lon: Number(location.longitude), // Convert to number using Number()
+      };
 
-  //     console.log(`Latitude: ${userLocation.lat}, Longitude: ${userLocation.lon}`);
-  //     setUserLocation([userLocation.lat, userLocation.lon]); // Set state for the map
+      console.log(`Latitude: ${userLocation.lat}, Longitude: ${userLocation.lon}`);
+      setUserLocation([userLocation.lat, userLocation.lon]); // Set state for the map
 
-  //     // Save the user location as an object in Chrome storage
-  //     chrome.storage.local.set({ userLocation }, () => {
-  //       console.log('Location saved to Chrome storage:', userLocation);
-  //     });
+      // Save the user location as an object in Chrome storage
+      chrome.storage.local.set({ userLocation }, () => {
+        console.log('Location saved to Chrome storage:', userLocation);
+      });
 
-  //     // Optionally, you can check for floods here if you want to trigger it immediately after form submission
-  //     chrome.runtime.sendMessage({ type: 'userLocation', ...userLocation }); // Send location to background
-  //   } else {
-  //     console.log('Geocoding failed or no results found');
-  //   }
-  // };
+      // Optionally, you can check for floods here if you want to trigger it immediately after form submission
+      chrome.runtime.sendMessage({ type: 'userLocation', ...userLocation }); // Send location to background
+    } else {
+      console.log('Geocoding failed or no results found');
+    }
+  };
 
 
   return (
@@ -114,13 +114,13 @@ const Options = () => {
       </header>
       <section className='mx-16'>
         <div>
-          {/* <UkMap userLocation={userLocation} /> */}
-          <UkMap />
+          <UkMap userLocation={userLocation} />
+
         </div>
         <div>
           <Form {...form}>
-            {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8"> */}
-            <form className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
               <FormField
                 control={form.control}
                 name="address"
@@ -149,3 +149,5 @@ const Options = () => {
 };
 
 export default Options;
+
+
