@@ -66,22 +66,22 @@ export function processPolygons(polygonData: any): GeoJSONFeatureCollection {
   return {
     type: "FeatureCollection",
     features: polygonData.map((polygon: any, polygonIndex: number) => {
-      console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
+      // console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
 
       return {
         type: "Feature",
         geometry: {
           type: "MultiPolygon",
           coordinates: polygon.map((p: any, pIndex: number) => {
-            console.log(`Processing p ${pIndex} in polygon ${polygonIndex}:`, JSON.stringify(p, null, 2));
+            // console.log(`Processing p ${pIndex} in polygon ${polygonIndex}:`, JSON.stringify(p, null, 2));
 
             if (!p.coordinates) {
               console.error(`Missing coordinates in p ${pIndex} of polygon ${polygonIndex}`);
               return [];
             }
 
-            const validCoords = p.coordinates.map((coordSet: any, coordSetIndex: number) => {
-              console.log(`Processing coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
+            const validCoords = p.coordinates.map((coordSet: any) => {
+              // console.log(`Processing coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
 
               const coords = Array.isArray(coordSet[0]) ? coordSet[0] : coordSet;
 

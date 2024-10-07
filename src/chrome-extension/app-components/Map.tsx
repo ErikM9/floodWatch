@@ -70,7 +70,7 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
 
 
         //           const validCoords = p.coordinates.map((coordSet: any, coordSetIndex: number) => {
-        //             console.log(`Processing coordSet ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
+        //             console.log(` ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
 
 
         //             const coords = Array.isArray(coordSet[0]) ? coordSet[0] : coordSet;
@@ -95,8 +95,9 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
         //   })
         // };
 
-        console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
+        // console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
         setGeoJsonData(geoJson);
+
       } catch (error) {
         console.error('Error fetching or processing polygon data:', error);
       }
