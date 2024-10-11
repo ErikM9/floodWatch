@@ -1,3 +1,25 @@
+// import React, { useEffect } from 'react';
+// import { useEffect } from 'react';
+// import { fetchFloodWarnings } from '../api/testApi'; // Adjust the path as necessary
+
+// const FloodWarningsLogger: React.FC = () => {
+//   useEffect(() => {
+//     const getFloodWarnings = async () => {
+//       const data = await fetchFloodWarnings();
+//       console.log('Flood Warnings with Polygons:', data);
+//     };
+
+//     getFloodWarnings();
+//   }, []);
+
+//   return null; // This component doesn't render anything in the UI
+// };
+
+// export default FloodWarningsLogger;
+
+
+
+
 import "../global.css";
 import { Mail } from 'lucide-react';
 import logoImage from './../public/logo.png'
@@ -15,16 +37,18 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { userAddress } from '@/chrome-extension/api/geocoding';
-import UkMap from '@/chrome-extension/app-components/Map';
+import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
-
+import UkMap from '../app-components/Map';
+import { getAndLogFloodData, logPolygonsFromFloodWarnings } from '../services/FloodDataService'
 const formSchema = z.object({
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
   }),
 })
+
+
 
 const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
@@ -35,6 +59,13 @@ const Options = () => {
       address: "",
     },
   });
+
+  // TODO this is for testing purpose only. Change location later.
+  getAndLogFloodData((floodData) => {
+    console.log('flood data from option page', floodData)
+  })
+  logPolygonsFromFloodWarnings()
+
 
   useEffect(() => {
     const loadSavedLocation = async () => {
@@ -68,27 +99,17 @@ const Options = () => {
     const location = await userAddress(data.address);
 
     if (location) {
-      // Ensure latitude and longitude are parsed as numbers
-      const userLocation = {
-        lat: Number(location.latitude), // Convert to number using Number()
-        lon: Number(location.longitude), // Convert to number using Number()
-      };
+      const newLocation: LatLngTuple = [location.latitude, location.longitude]
+      console.log(`Latitude: ${location.latitude}, Longitude: ${location.longitude}`)
+      setUserLocation(newLocation);
 
-      console.log(`Latitude: ${userLocation.lat}, Longitude: ${userLocation.lon}`);
-      setUserLocation([userLocation.lat, userLocation.lon]); // Set state for the map
-
-      // Save the user location as an object in Chrome storage
-      chrome.storage.local.set({ userLocation }, () => {
-        console.log('Location saved to Chrome storage:', userLocation);
-      });
-
-      // Optionally, you can check for floods here if you want to trigger it immediately after form submission
-      chrome.runtime.sendMessage({ type: 'userLocation', ...userLocation }); // Send location to background
+      chrome.storage.local.set({ userLocation: newLocation }, () => {
+        console.log('location saved to chrome storage');
+      })
     } else {
       console.log('Geocoding failed or no results found');
     }
   };
-
 
   return (
 
@@ -115,12 +136,10 @@ const Options = () => {
       <section className='mx-16'>
         <div>
           <UkMap userLocation={userLocation} />
-
         </div>
         <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
               <FormField
                 control={form.control}
                 name="address"
@@ -149,5 +168,3 @@ const Options = () => {
 };
 
 export default Options;
-
-

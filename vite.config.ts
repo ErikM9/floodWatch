@@ -33,6 +33,7 @@ export default defineConfig({
         options: resolve(__dirname, "options.html"),
         background: resolve(__dirname, "src/chrome-extension/background.ts"),
         content: resolve(__dirname, "src/chrome-extension/content.ts"),
+        service: resolve(__dirname, "src/chrome-extension/services/FloodDataService.ts")
       },
       output: {
         entryFileNames: "[name].js",
