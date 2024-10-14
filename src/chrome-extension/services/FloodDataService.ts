@@ -21,8 +21,8 @@ type PolygonData = {
   area: string;
   description: string;
   geometry: {
-    coordinates: PolygonCoordinates | MultiPolygonCoordinates;
     type: string;
+    coordinates: PolygonCoordinates | MultiPolygonCoordinates;
   };
 };
 
