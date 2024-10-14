@@ -69,6 +69,7 @@ const polygonAPIBase = 'https://environment.data.gov.uk/flood-monitoring/id/floo
 export async function fetchFloodWarnings(): Promise<any[]> {
   try {
     const response = await axios.get<FloodResponse>(floodAPI);
+    console.log("response from API", response)
     const floods = response.data.items;
     const floodWarnings: any[] = [];
     console.log('flood warnings from the API', floodWarnings)
@@ -101,7 +102,7 @@ export async function fetchPolygonData(floodAreaID: string): Promise<any> {
   try {
     const response = await axios.get<PolygonResponse>(polygonEndpoint);
     const polygonData = response.data;
-
+    console.log("polygon end point:", polygonData)
     return extractCoordinates(polygonData);
   } catch (error) {
     console.error(`Error fetching polygon for flood area ${floodAreaID}:`, error);
@@ -116,19 +117,23 @@ export function extractCoordinates(polygonData: PolygonResponse): any[] {
   // Iterate through the features and handle each one
   const polygons = features.map(feature => {
     const geometryType = feature.geometry.type;
-    let coordinates: number[][] = [];
+    // let coordinates: number[][] = [];
 
-    if (geometryType === 'Polygon') {
-      coordinates = feature.geometry.coordinates[0] as number[][]; // Extract the first set of coordinates in Polygon
-    } else if (geometryType === 'MultiPolygon') {
-      // Handle multiple polygons (each sub-polygon has a separate set of coordinates)
-      coordinates = (feature.geometry.coordinates as number[][][]).map(polygon => polygon[0]);
-    }
+    // if (geometryType === 'Polygon') {
+    //   coordinates = feature.geometry.coordinates[0] as number[][]; // Extract the first set of coordinates in Polygon
+    // } else if (geometryType === 'MultiPolygon') {
+    //   // Handle multiple polygons (each sub-polygon has a separate set of coordinates)
+    //   coordinates = (feature.geometry.coordinates as number[][][]).map(polygon => polygon[0]);
+    // }
 
     return {
       area: feature.properties.AREA,
       description: feature.properties.DESCRIP,
-      coordinates: coordinates // Extracted coordinates for the polygon or multipolygon
+      geometry: {
+        type: geometryType,
+        coordinates: feature.geometry.coordinates
+      },
+      // coordinates: coordinates // Extracted coordinates for the polygon or multipolygon
     };
   });
 
