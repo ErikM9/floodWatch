@@ -285,6 +285,8 @@ async function storeFloodWarnings() {
 
     chrome.storage.local.set({ floodData: floodWarnings }, () => {
       console.log('Flood data stored in local storage.');
+
+      chrome.runtime.sendMessage({ type: "floodDataUpdated", floodData: floodWarnings });
     });
   } catch (error) {
     console.error('Error fetching and storing flood warnings:', error);

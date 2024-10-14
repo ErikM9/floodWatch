@@ -35,7 +35,7 @@ type Flood = {
 
 
 
-
+let listernerAdded = false;
 
 export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
   chrome.storage.local.get('floodData', (result) => {
@@ -43,6 +43,17 @@ export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
     console.log('floodData from service:', floodData)
     callback(floodData);
   });
+
+  if (!listernerAdded) {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === 'floodDataUpdated') {
+        console.log("updated flood data received", message.floodData);
+        callback(message.floodData)
+      }
+    });
+    listernerAdded = true;
+  }
+
 }
 
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
