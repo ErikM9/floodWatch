@@ -282,14 +282,24 @@ async function storeFloodWarnings() {
     const floodWarnings = await fetchFloodWarnings();
     console.log('Flood Warnings:', floodWarnings);
 
+    chrome.storage.local.get('floodData', (result) => {
+      const storedFloodData = result.floodData || [];
 
-    chrome.storage.local.set({ floodData: floodWarnings }, () => {
-      console.log('Flood data stored in local storage.');
+      const isDataChanged = JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
 
-      chrome.runtime.sendMessage({ type: "floodDataUpdated", floodData: floodWarnings });
+      if (isDataChanged) {
+        chrome.storage.local.set({ floodData: floodWarnings }, () => {
+          console.log('flood data stored in local storage.');
+
+          // chrome.runtime.sendMessage({ type: 'floodDataUpdated', floodData: floodWarnings });
+          // console.log('floodDataUpdated was sent because data changed.');
+        });
+      } else {
+        console.log('flood data has not changed, no message was sent');
+      }
     });
   } catch (error) {
-    console.error('Error fetching and storing flood warnings:', error);
+    console.error('error fetching and storing flood warnings:', error);
   }
 }
 

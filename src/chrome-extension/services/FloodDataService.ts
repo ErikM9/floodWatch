@@ -31,11 +31,7 @@ type Flood = {
   polygonData: PolygonData[];
 };
 
-
-
-
-
-let listernerAdded = false;
+let listenerAdded = false;
 
 export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
   chrome.storage.local.get('floodData', (result) => {
@@ -44,23 +40,27 @@ export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
     callback(floodData);
   });
 
-  if (!listernerAdded) {
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === 'floodDataUpdated') {
-        console.log("updated flood data received", message.floodData);
-        callback(message.floodData)
+  if (!listenerAdded) {
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'local' && changes.floodData) {
+        const updatedFloodData = changes.floodData.newValue || [];
+        console.log('updated flood data detected in service:', updatedFloodData);
+
+        callback(updatedFloodData);
       }
     });
-    listernerAdded = true;
+    listenerAdded = true;
   }
-
 }
 
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
   const allFloodData: any[] = [];
 
   return new Promise((resolve) => {
+
     getAndLogFloodData((floodData) => {
+      allFloodData.length = 0;
       floodData.forEach((flood) => {
         const {
           id,
