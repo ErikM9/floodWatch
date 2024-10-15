@@ -1,5 +1,5 @@
-import * as turf from '@turf/turf';
-// import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
+import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
+import { point } from '@turf/helpers';
 
 
 type PolygonCoordinates = number[][][];
@@ -137,34 +137,119 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
 
 export const formatPolygonData = async () => {
 
+  const floodData: Flood[] = await logPolygonsFromFloodWarnings();
+  console.log('Flood data from check if user is flooded:', floodData);
+
+
+  // const geometry = floodData.forEach((flood) => {
+  //   console.log('Flood from check if user is flooded:', flood);
+
+  //   flood.polygonData.forEach((data) => {
+  //     console.log("geometry from service:", data.geometry)
+  //   })
+
+  // })
+
+  const geometries = floodData.flatMap((flood) =>
+    flood.polygonData.map((data) => {
+      console.log("geometry from service:", data.geometry);
+      return data.geometry; // Collect geometry
+    })
+  );
+
+  console.log('returned geometry:', geometries)
+  return geometries;
+
+}
+
+// export const isUserFlooded = async () => {
+//   const result = await chrome.storage.local.get(['userLocation']);
+//   const savedLocation = result.userLocation;
+
+//   if (!savedLocation || savedLocation.length !== 2) {
+//     console.error('Invalid user location from Chrome local storage:', savedLocation);
+//     return;
+//   }
+
+//   const userLocation = turf.point([savedLocation[1], savedLocation[0]]);
+//   console.log('User location in service:', userLocation);
+
+//   const geometries = await formatPolygonData();
+
+//   let isInside = false;
+
+//   // Loop through all geometries
+//   for (const geometry of geometries) {
+//     if (geometry.type === 'Polygon') {
+//       // Check if the user is inside a Polygon using the direct import
+//       if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: geometry.coordinates })) {
+//         isInside = true;
+//         break; // Stop checking once inside a polygon
+//       }
+//     } else if (geometry.type === 'MultiPolygon') {
+//       // Check each polygon in the MultiPolygon
+//       for (const polygon of geometry.coordinates) {
+//         if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygon })) {
+//           isInside = true;
+//           break; // Stop checking once inside a polygon
+//         }
+//       }
+//     }
+//     if (isInside) break; // Stop if user is found inside any geometry
+//   }
+
+//   // Log the result
+//   if (isInside) {
+//     console.log('User is flooded');
+//   } else {
+//     console.log('User is safe');
+//   }
+// };
+
+export const isUserFlooded = async () => {
   const result = await chrome.storage.local.get(['userLocation']);
   const savedLocation = result.userLocation;
-
 
   if (!savedLocation || savedLocation.length !== 2) {
     console.error('Invalid user location from Chrome local storage:', savedLocation);
     return;
   }
 
-
-  const userLocation = turf.point([savedLocation[1], savedLocation[0]]);
+  const userLocation = point([savedLocation[1], savedLocation[0]]);
   console.log('User location in service:', userLocation);
 
-  console.log("checkIfUserIsFlooded called");
+  const geometries = await formatPolygonData();
+
+  let isFlooded = false;
 
 
-  const floodData: Flood[] = await logPolygonsFromFloodWarnings();
-  console.log('Flood data from check if user is flooded:', floodData);
+  for (const geometry of geometries) {
+    if (geometry.type === 'Polygon') {
+
+      const polygonCoordinates = geometry.coordinates as number[][][];
+
+      if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygonCoordinates })) {
+        isFlooded = true;
+        break;
+      }
+    } else if (geometry.type === 'MultiPolygon') {
+
+      const multiPolygonCoordinates = geometry.coordinates as number[][][][];
+
+      for (const polygon of multiPolygonCoordinates) {
+        if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygon })) {
+          isFlooded = true;
+          break;
+        }
+      }
+    }
+    if (isFlooded) break;
+  }
 
 
-  floodData.forEach((flood) => {
-    console.log('Flood from check if user is flooded:', flood);
-
-    flood.polygonData.forEach((geometry) => {
-      console.log("geometry from service:", geometry.geometry)
-    })
-
-  })
-  // return geometry.geometry but rename it first
-}
-
+  if (isFlooded) {
+    console.log('user is flooded');
+  } else {
+    console.log('user is safe');
+  }
+};

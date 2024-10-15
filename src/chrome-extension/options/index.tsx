@@ -41,7 +41,7 @@ import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 import UkMap from '../app-components/Map';
-import { formatPolygonData, getAndLogFloodData, logPolygonsFromFloodWarnings } from '../services/FloodDataService'
+import { formatPolygonData, getAndLogFloodData, isUserFlooded, logPolygonsFromFloodWarnings } from '../services/FloodDataService'
 const formSchema = z.object({
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
@@ -76,6 +76,7 @@ const Options = () => {
 
     logPolygonsFromFloodWarnings();
     formatPolygonData();
+    isUserFlooded();
   }, []); // Empty dependency array to ensure this runs only once on mount
 
   useEffect(() => {
