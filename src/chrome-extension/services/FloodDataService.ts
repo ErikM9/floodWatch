@@ -344,31 +344,37 @@ let listenerAdded = false;
 
 
 export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void): void {
-
   getFloodWarningsFromDB()
     .then((floodData) => {
       console.log('floodData from service IndexedDB T', floodData);
       callback(floodData);
-      isUserFlooded(floodData);
+
+      // Call `isUserFlooded` only after valid flood data is retrieved
+      if (floodData.length > 0) {
+        isUserFlooded(floodData);
+      }
     })
     .catch((error) => {
-      console.error('error fetching flood data from IndexedDB', error);
+      console.error('Error fetching flood data from IndexedDB', error);
       callback([]);
     });
-
 
   if (!listenerAdded) {
     setInterval(() => {
       getFloodWarningsFromDB()
         .then((updatedFloodData) => {
-          console.log('updated flood data detected in service IndexedDB', updatedFloodData);
+          console.log('Updated flood data detected in service IndexedDB', updatedFloodData);
           callback(updatedFloodData);
-          isUserFlooded(updatedFloodData);
+
+          // Only call `isUserFlooded` if the data has changed or is relevant
+          // if (updatedFloodData.length > 0) {
+          //   isUserFlooded(updatedFloodData);
+          // }
         })
         .catch((error) => {
-          console.error('error fetching updated flood data from IndexedDB', error);
+          console.error('Error fetching updated flood data from IndexedDB', error);
         });
-    }, 900000); // check every 15min
+    }, 900000); // 15-minute interval
     listenerAdded = true;
   }
 }
@@ -512,14 +518,14 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
   const savedLocation = result.userLocation;
 
   if (!savedLocation || savedLocation.length !== 2) {
-    console.error('invalid user location in Chrome storage:', savedLocation);
+    console.error('Invalid user location in Chrome storage:', savedLocation);
     return;
   }
 
   const userLocation = point([savedLocation[1], savedLocation[0]]);
-  console.log('user location in service:', userLocation);
+  console.log('User location in service:', userLocation);
 
-  console.log('floodData inside isUserFlooded:', floodData);
+  console.log('Flood data inside isUserFlooded:', floodData);
 
   let isFlooded = false;
   let floodedPolygonData: FloodWithPolygonData | null = null;
@@ -553,16 +559,8 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
   }
 
   if (isFlooded && floodedPolygonData) {
-    console.log('The user is flooded here:');
-    console.log(`County: ${floodedPolygonData.county}`);
-    console.log(`Description: ${floodedPolygonData.description}`);
-    console.log(`ID: ${floodedPolygonData.id}`);
-    console.log(`Message: ${floodedPolygonData.message}`);
-    console.log(`Severity: ${floodedPolygonData.severity}`);
-    console.log(`Severity level: ${floodedPolygonData.severityLevel}`);
-    console.log(`Last update: ${floodedPolygonData.timeMessageChanged}`);
-    console.log(`Polygon area: ${floodedPolygonData.polygonData[0].area}`);
-    console.log(`Polygon description: ${floodedPolygonData.polygonData[0].description}`);
+    console.log(floodedPolygonData.message)
+    // return { flooded: true, info: floodedPolygonData }
   } else {
     console.log('The user is safe');
   }

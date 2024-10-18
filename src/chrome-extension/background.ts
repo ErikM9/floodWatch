@@ -274,60 +274,60 @@
 
 
 
-import { fetchFloodWarnings } from './api/testApi';
+// import { fetchFloodWarnings } from './api/testApi';
 
 
-async function storeFloodWarnings() {
-  try {
-    const floodWarnings = await fetchFloodWarnings();
-    console.log('Flood Warnings:', floodWarnings);
+// async function storeFloodWarnings() {
+//   try {
+//     const floodWarnings = await fetchFloodWarnings();
+//     console.log('Flood Warnings:', floodWarnings);
 
-    chrome.storage.local.get('floodData', (result) => {
-      const storedFloodData = result.floodData || [];
+//     chrome.storage.local.get('floodData', (result) => {
+//       const storedFloodData = result.floodData || [];
 
-      console.log('this is flood data', typeof storedFloodData)
+//       console.log('this is flood data', typeof storedFloodData)
 
-      const isDataChanged = JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
+//       const isDataChanged = JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
 
-      if (isDataChanged) {
-        chrome.storage.local.set({ floodData: floodWarnings }, () => {
-          console.log('flood data stored in local storage.');
+//       if (isDataChanged) {
+//         chrome.storage.local.set({ floodData: floodWarnings }, () => {
+//           console.log('flood data stored in local storage.');
 
-          // chrome.runtime.sendMessage({ type: 'floodDataUpdated', floodData: floodWarnings });
-          // console.log('floodDataUpdated was sent because data changed.');
-        });
-      } else {
-        console.log('flood data has not changed, no message was sent');
-      }
-    });
-  } catch (error) {
-    console.error('error fetching and storing flood warnings:', error);
-  }
-}
-
-
-chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === 'checkFloods') {
-    await storeFloodWarnings();
-  }
-});
+//           // chrome.runtime.sendMessage({ type: 'floodDataUpdated', floodData: floodWarnings });
+//           // console.log('floodDataUpdated was sent because data changed.');
+//         });
+//       } else {
+//         console.log('flood data has not changed, no message was sent');
+//       }
+//     });
+//   } catch (error) {
+//     console.error('error fetching and storing flood warnings:', error);
+//   }
+// }
 
 
-storeFloodWarnings();
+// chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
+
+// chrome.alarms.onAlarm.addListener(async (alarm) => {
+//   if (alarm.name === 'checkFloods') {
+//     await storeFloodWarnings();
+//   }
+// });
 
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'getFloodData') {
-    chrome.storage.local.get('floodData', (result) => {
-      const floodData = result.floodData || [];
-      console.log('Flood data sent to content script:', floodData);
-      sendResponse(floodData);
-    });
-    return true;
-  }
-});
+// storeFloodWarnings();
+
+
+// chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+//   if (message.type === 'getFloodData') {
+//     chrome.storage.local.get('floodData', (result) => {
+//       const floodData = result.floodData || [];
+//       console.log('Flood data sent to content script:', floodData);
+//       sendResponse(floodData);
+//     });
+//     return true;
+//   }
+// });
 
 
 
