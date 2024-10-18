@@ -32,6 +32,7 @@ export default defineConfig({
         popup: resolve(__dirname, "popup.html"),
         options: resolve(__dirname, "options.html"),
         background: resolve(__dirname, "src/chrome-extension/background.ts"),
+        background2: resolve(__dirname, "src/chrome-extension/background2.ts"),
         content: resolve(__dirname, "src/chrome-extension/content.ts"),
         service: resolve(__dirname, "src/chrome-extension/services/FloodDataService.ts")
       },

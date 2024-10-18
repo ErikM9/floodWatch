@@ -1,153 +1,153 @@
-// // import fetchFloodData from './api/ukFloodAPI';
-// // import * as turf from "@turf/turf"
+// import fetchFloodData from './api/ukFloodAPI';
+// import * as turf from "@turf/turf"
 
 
-// // async function checkUserLocation(userLocation: { lat: number, lon: number }) {
-// //   try {
-// //     const polygons = await fetchFloodData();
-// //     console.log("fetched polygons", polygons)
+// async function checkUserLocation(userLocation: { lat: number, lon: number }) {
+//   try {
+//     const polygons = await fetchFloodData();
+//     console.log("fetched polygons", polygons)
 
-// //     const userPoint = turf.point([userLocation.lon, userLocation.lat]);
+//     const userPoint = turf.point([userLocation.lon, userLocation.lat]);
 
-// //     let isInPolygon = false;
+//     let isInPolygon = false;
 
-// //     polygons.forEach((polygon: any, polygonIndex: number) => {
-// //       polygon.forEach((p: any, pIndex: number) => {
-// //         const poly = turf.polygon(p.coordinates);
+//     polygons.forEach((polygon: any, polygonIndex: number) => {
+//       polygon.forEach((p: any, pIndex: number) => {
+//         const poly = turf.polygon(p.coordinates);
 
-// //         const isInside = turf.booleanPointInPolygon(userPoint, poly);
-// //         if (isInside) {
-// //           console.log('user is inside polygon ${polygonIndex}, ${pIndex}');
-// //           isInPolygon = true;
-// //         }
-// //       });
-// //     });
+//         const isInside = turf.booleanPointInPolygon(userPoint, poly);
+//         if (isInside) {
+//           console.log('user is inside polygon ${polygonIndex}, ${pIndex}');
+//           isInPolygon = true;
+//         }
+//       });
+//     });
 
-// //     if (!isInPolygon) {
-// //       console.log("user is not inside any polygon")
-// //     }
-// //   } catch (error) {
-// //     console.error("error fetching polygons or checking location:", error);
-// //   }
+//     if (!isInPolygon) {
+//       console.log("user is not inside any polygon")
+//     }
+//   } catch (error) {
+//     console.error("error fetching polygons or checking location:", error);
+//   }
+// }
+// // function checkUserInPolygon(userLocation, polygons) {
+// //   const userPoint = turf.point([userLocation.lon, userLocation.lat])
 // // }
-// // // function checkUserInPolygon(userLocation, polygons) {
-// // //   const userPoint = turf.point([userLocation.lon, userLocation.lat])
-// // // }
-// // fetchFloodData();
+// fetchFloodData();
 
 
-// // // function getUserLocationFromStorage(callback) {
-// // //   chrome.storage.local.get(['userLocation'], ())
-// // // }
-
-// // // Function to get and log the user location
-// // function checkUserLocation() {
-// //   chrome.storage.local.get(['userLocation'], function (result) {
-// //     if (chrome.runtime.lastError) {
-// //       console.error('Error retrieving userLocation:', chrome.runtime.lastError);
-// //     } else if (result.userLocation) {
-// //       const userLocationObj = result.userLocation;
-// //       const userLocationArr = Object.entries(userLocationObj);
-// //       const extractedLocation = userLocationArr.map(item => item[1])
-// //       console.log("extractedLocation", extractedLocation)
-// //       console.log('User location retrieved in background:', result.userLocation);
-// //       console.log('Latitude:', extractedLocation[0]);
-// //       console.log('Longitude:', extractedLocation[1]);
-// //     } else {
-// //       console.log('No user location found in storage');
-// //     }
-// //   });
+// // function getUserLocationFromStorage(callback) {
+// //   chrome.storage.local.get(['userLocation'], ())
 // // }
 
-// // // Listen for changes in storage
-// // chrome.storage.onChanged.addListener(function (changes, namespace) {
-// //   if (namespace === 'local' && changes.userLocation) {
-// //     console.log('User location updated in storage');
-// //     checkUserLocation();
-// //   }
-// // });
+// // Function to get and log the user location
+// function checkUserLocation() {
+//   chrome.storage.local.get(['userLocation'], function (result) {
+//     if (chrome.runtime.lastError) {
+//       console.error('Error retrieving userLocation:', chrome.runtime.lastError);
+//     } else if (result.userLocation) {
+//       const userLocationObj = result.userLocation;
+//       const userLocationArr = Object.entries(userLocationObj);
+//       const extractedLocation = userLocationArr.map(item => item[1])
+//       console.log("extractedLocation", extractedLocation)
+//       console.log('User location retrieved in background:', result.userLocation);
+//       console.log('Latitude:', extractedLocation[0]);
+//       console.log('Longitude:', extractedLocation[1]);
+//     } else {
+//       console.log('No user location found in storage');
+//     }
+//   });
+// }
 
-// // // Initial check for user location when the background script starts
-// // checkUserLocation();
+// // Listen for changes in storage
+// chrome.storage.onChanged.addListener(function (changes, namespace) {
+//   if (namespace === 'local' && changes.userLocation) {
+//     console.log('User location updated in storage');
+//     checkUserLocation();
+//   }
+// });
 
-// // import fetchFloodData from './api/ukFloodAPI';
-// // import { point } from "@turf/helpers";  // Import point creation
-// // import booleanPointInPolygon from "@turf/boolean-point-in-polygon";  // Import booleanPointInPolygon
+// // Initial check for user location when the background script starts
+// checkUserLocation();
 
-// // // Function to fetch polygons and check if user is inside
-// // async function fetchAndCheckUserLocation(userLocation: { lat: number; lon: number }) {
-// //   try {
-// //     const polygons = await fetchFloodData();  // Fetch polygons from the API
-// //     console.log("Fetched polygons:", polygons);
+// import fetchFloodData from './api/ukFloodAPI';
+// import { point } from "@turf/helpers";  // Import point creation
+// import booleanPointInPolygon from "@turf/boolean-point-in-polygon";  // Import booleanPointInPolygon
 
-// //     const userPoint = point([userLocation.lon, userLocation.lat]);  // Create a Turf.js point from user location
+// // Function to fetch polygons and check if user is inside
+// async function fetchAndCheckUserLocation(userLocation: { lat: number; lon: number }) {
+//   try {
+//     const polygons = await fetchFloodData();  // Fetch polygons from the API
+//     console.log("Fetched polygons:", polygons);
 
-// //     let isInsideAnyPolygon = false;
+//     const userPoint = point([userLocation.lon, userLocation.lat]);  // Create a Turf.js point from user location
 
-// //     // Loop through polygons and check if user is inside
-// //     polygons.forEach((polygon: any, polygonIndex: number) => {
-// //       polygon.forEach((p: any, pIndex: number) => {
-// //         const poly = turf.polygon(p.coordinates);  // Convert polygon coordinates to Turf.js polygon
+//     let isInsideAnyPolygon = false;
 
-// //         const isInside = booleanPointInPolygon(userPoint, poly);  // Check if user point is inside the polygon
-// //         if (isInside) {
-// //           console.log(`User is inside polygon ${polygonIndex}, ${pIndex}`);
-// //           isInsideAnyPolygon = true;
-// //         }
-// //       });
-// //     });
+//     // Loop through polygons and check if user is inside
+//     polygons.forEach((polygon: any, polygonIndex: number) => {
+//       polygon.forEach((p: any, pIndex: number) => {
+//         const poly = turf.polygon(p.coordinates);  // Convert polygon coordinates to Turf.js polygon
 
-// //     if (!isInsideAnyPolygon) {
-// //       console.log('User is NOT inside any polygon');
-// //     }
+//         const isInside = booleanPointInPolygon(userPoint, poly);  // Check if user point is inside the polygon
+//         if (isInside) {
+//           console.log(`User is inside polygon ${polygonIndex}, ${pIndex}`);
+//           isInsideAnyPolygon = true;
+//         }
+//       });
+//     });
 
-// //   } catch (error) {
-// //     console.error('Error fetching polygons or checking location:', error);
-// //   }
-// // }
+//     if (!isInsideAnyPolygon) {
+//       console.log('User is NOT inside any polygon');
+//     }
 
-// // // Function to get and log the user location, then check against polygons
-// // function getUserLocationAndCheck() {
-// //   chrome.storage.local.get(['userLocation'], function (result) {
-// //     if (chrome.runtime.lastError) {
-// //       console.error('Error retrieving userLocation:', chrome.runtime.lastError);
-// //     } else if (result.userLocation) {
+//   } catch (error) {
+//     console.error('Error fetching polygons or checking location:', error);
+//   }
+// }
 
-// //       const userLocationObj = result.userLocation;
-// //       const userLocationArr = Object.entries(userLocationObj);
-// //       const extractedLocation = userLocationArr.map(item => item[1])
-// //       console.log("extractedLocation", extractedLocation)
-// //       console.log('User location retrieved in background:', result.userLocation);
-// //       console.log('Latitude:', extractedLocation[0]);
-// //       console.log('Longitude:', extractedLocation[1]);
+// // Function to get and log the user location, then check against polygons
+// function getUserLocationAndCheck() {
+//   chrome.storage.local.get(['userLocation'], function (result) {
+//     if (chrome.runtime.lastError) {
+//       console.error('Error retrieving userLocation:', chrome.runtime.lastError);
+//     } else if (result.userLocation) {
+
+//       const userLocationObj = result.userLocation;
+//       const userLocationArr = Object.entries(userLocationObj);
+//       const extractedLocation = userLocationArr.map(item => item[1])
+//       console.log("extractedLocation", extractedLocation)
+//       console.log('User location retrieved in background:', result.userLocation);
+//       console.log('Latitude:', extractedLocation[0]);
+//       console.log('Longitude:', extractedLocation[1]);
 
 
 
 
-// //       // const userLocationObj = result.userLocation;
-// //       // const userLocationArr = Object.entries(userLocationObj);
-// //       // const extractedLocation = userLocationArr.map(item => item[1]);
+//       // const userLocationObj = result.userLocation;
+//       // const userLocationArr = Object.entries(userLocationObj);
+//       // const extractedLocation = userLocationArr.map(item => item[1]);
 
-// //       const userLocation = [extractedLocation[0], extractedLocation[1]];
+//       const userLocation = [extractedLocation[0], extractedLocation[1]];
 
-// //       console.log("User location:", userLocation);
-// //       fetchAndCheckUserLocation(userLocation);  // Fetch polygons and check user location
-// //     } else {
-// //       console.log('No user location found in storage');
-// //     }
-// //   });
-// // }
+//       console.log("User location:", userLocation);
+//       fetchAndCheckUserLocation(userLocation);  // Fetch polygons and check user location
+//     } else {
+//       console.log('No user location found in storage');
+//     }
+//   });
+// }
 
-// // // Listen for changes in storage and trigger location checking
-// // chrome.storage.onChanged.addListener(function (changes, namespace) {
-// //   if (namespace === 'local' && changes.userLocation) {
-// //     console.log('User location updated in storage');
-// //     getUserLocationAndCheck();
-// //   }
-// // });
+// // Listen for changes in storage and trigger location checking
+// chrome.storage.onChanged.addListener(function (changes, namespace) {
+//   if (namespace === 'local' && changes.userLocation) {
+//     console.log('User location updated in storage');
+//     getUserLocationAndCheck();
+//   }
+// });
 
-// // // Initial check for user location when the background script starts
-// // getUserLocationAndCheck();
+// // Initial check for user location when the background script starts
+// getUserLocationAndCheck();
 
 
 // import fetchFloodData from './api/ukFloodAPI';
@@ -245,7 +245,7 @@
 // // Initial check for user location when the background script starts
 // getUserLocationAndCheck();
 
-//------------------------------------------
+// ------------------------------------------
 
 // import { fetchFloodWarnings } from './api/testApi'; // Adjust the path if necessary
 // // Function to fetch and log polygons from flood warnings
@@ -332,26 +332,5 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 
 
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UkFloodWarningDB', 1);
 
-    request.onerror = (event) => {
-      reject(`database error: ${(event.target as IDBRequest).error}`);
-    };
 
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBRequest).result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBRequest).result;
-      if (!db.objectStoreNames.contains('floodData')) {
-        db.createObjectStore('floodData', { keyPath: 'id' });
-        console.log('created object store: floodData');
-      }
-    };
-  });
-}
-
-openDatabase()

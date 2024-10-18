@@ -231,8 +231,8 @@
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { point } from '@turf/helpers';
 
-type PolygonCoordinates = number[][][];
-type MultiPolygonCoordinates = number[][][][];
+// type PolygonCoordinates = number[][][];
+// type MultiPolygonCoordinates = number[][][][];
 
 // type FloodDataFromAPI = {
 //   area?: string;
@@ -244,46 +244,163 @@ type MultiPolygonCoordinates = number[][][][];
 //   timeMessageChanged?: string;
 // };
 
-type PolygonData = {
+// type PolygonData = {
+//   area: string;
+//   description: string;
+//   geometry: {
+//     type: string;
+//     coordinates: PolygonCoordinates | MultiPolygonCoordinates;
+//   };
+// };
+
+// type FloodWithPolygonData = {
+//   polygonData: PolygonData[];
+//   county: string;
+//   description: string;
+//   id: string;
+//   message: string;
+//   severity: string;
+//   severityLevel: number;
+//   timeMessageChanged: string;
+// };
+
+// // ___________________
+
+// type Geometry = {
+//   type: 'Polygon' | 'MultiPolygon';
+//   coordinates: number[][] | number[][][];
+// }
+
+// type PolygonDataTwo = {
+//   area: string;
+//   description: string;
+//   geometry: Geometry
+// }
+
+// type FloodWarning = {
+//   county: string;
+//   description: string;
+//   id: string;
+//   message: string;
+//   polygonData: PolygonDataTwo[];
+//   riverOrSea: string;
+//   severity: string;
+//   severityLevel: string;
+//   timeMessageChanged: string;
+// }
+
+
+// Correct your PolygonData and PolygonDataTwo types to ensure compatibility
+
+interface PolygonData {
   area: string;
   description: string;
   geometry: {
-    type: string;
-    coordinates: PolygonCoordinates | MultiPolygonCoordinates;
+    type: 'Polygon' | 'MultiPolygon';
+    coordinates: number[][][] | number[][][][];
   };
-};
+}
 
-type FloodWithPolygonData = {
-  polygonData: PolygonData[];
-  county: string;
+interface PolygonDataTwo {
+  area: string;
   description: string;
+  geometry: {
+    type: 'Polygon' | 'MultiPolygon';
+    coordinates: number[][][] | number[][][][];
+  };
+}
+
+
+interface FloodWarning {
   id: string;
-  message: string;
+  description: string;
+  county: string;
   severity: string;
   severityLevel: number;
+  message: string;
+  polygonData: PolygonDataTwo[];
+  riverOrSea: string;
   timeMessageChanged: string;
-};
+}
+
+interface FloodWithPolygonData {
+  id: string;
+  description: string;
+  county: string;
+  severity: string;
+  severityLevel: number;
+  message: string;
+  polygonData: PolygonData[];
+  riverOrSea: string;
+  timeMessageChanged: string;
+}
+
+
+import { getFloodWarningsFromDB } from '../background2';
 
 let listenerAdded = false;
 
-export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
-  chrome.storage.local.get('floodData', (result) => {
-    const floodData = result.floodData || [];
-    console.log('floodData from service:', floodData);
-    callback(floodData);
-  });
+
+
+
+export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void): void {
+
+  getFloodWarningsFromDB()
+    .then((floodData) => {
+      console.log('floodData from service IndexedDB T', floodData);
+      callback(floodData);
+      isUserFlooded(floodData);
+    })
+    .catch((error) => {
+      console.error('error fetching flood data from IndexedDB', error);
+      callback([]);
+    });
+
 
   if (!listenerAdded) {
-    chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === 'local' && changes.floodData) {
-        const updatedFloodData = changes.floodData.newValue || [];
-        console.log('updated flood data detected in service:', updatedFloodData);
-        callback(updatedFloodData);
-      }
-    });
+    setInterval(() => {
+      getFloodWarningsFromDB()
+        .then((updatedFloodData) => {
+          console.log('updated flood data detected in service IndexedDB', updatedFloodData);
+          callback(updatedFloodData);
+          isUserFlooded(updatedFloodData);
+        })
+        .catch((error) => {
+          console.error('error fetching updated flood data from IndexedDB', error);
+        });
+    }, 900000); // check every 15min
     listenerAdded = true;
   }
 }
+
+
+
+
+
+
+
+//_______
+
+// let listenerAdded = false;
+
+// export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
+//   chrome.storage.local.get('floodData', (result) => {
+//     const floodData = result.floodData || [];
+//     console.log('floodData from service:', floodData);
+//     callback(floodData);
+//   });
+
+//   if (!listenerAdded) {
+//     chrome.storage.onChanged.addListener((changes, area) => {
+//       if (area === 'local' && changes.floodData) {
+//         const updatedFloodData = changes.floodData.newValue || [];
+//         console.log('updated flood data detected in service:', updatedFloodData);
+//         callback(updatedFloodData);
+//       }
+//     });
+//     listenerAdded = true;
+//   }
+// }
 
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
   const allFloodData: any[] = [];
@@ -325,7 +442,72 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
   });
 }
 
-export const isUserFlooded = async () => {
+// export const isUserFlooded = async () => {
+//   const result = await chrome.storage.local.get(['userLocation']);
+//   const savedLocation = result.userLocation;
+
+//   if (!savedLocation || savedLocation.length !== 2) {
+//     console.error('invalid user location in Chrome storage:', savedLocation);
+//     return;
+//   }
+
+//   const userLocation = point([savedLocation[1], savedLocation[0]]);
+//   console.log('user location in service:', userLocation);
+
+//   const floodData: FloodWithPolygonData[] = await logPolygonsFromFloodWarnings();
+//   console.log('floodData inside isUserFlooded:', floodData);
+
+//   let isFlooded = false;
+//   let floodedPolygonData: FloodWithPolygonData | null = null;
+
+
+//   for (const flood of floodData) {
+//     for (const polygonData of flood.polygonData) {
+//       const geometry = polygonData.geometry;
+
+//       if (geometry.type === 'Polygon') {
+//         const polygonCoordinates = geometry.coordinates as number[][][];
+
+//         if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygonCoordinates })) {
+//           isFlooded = true;
+//           floodedPolygonData = flood;
+//           break;
+//         }
+//       } else if (geometry.type === 'MultiPolygon') {
+//         const multiPolygonCoordinates = geometry.coordinates as number[][][][];
+
+//         for (const polygon of multiPolygonCoordinates) {
+//           if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygon })) {
+//             isFlooded = true;
+//             floodedPolygonData = flood;
+//             break;
+//           }
+//         }
+//       }
+//       if (isFlooded) break;
+//     }
+//     if (isFlooded) break;
+//   }
+
+
+//   if (isFlooded && floodedPolygonData) {
+//     console.log('The user is flooded here:');
+//     console.log(`County: ${floodedPolygonData.county}`);
+//     console.log(`Description: ${floodedPolygonData.description}`);
+//     console.log(`ID: ${floodedPolygonData.id}`);
+//     console.log(`Message: ${floodedPolygonData.message}`);
+//     console.log(`Severity: ${floodedPolygonData.severity}`);
+//     console.log(`Severity level: ${floodedPolygonData.severityLevel}`);
+//     console.log(`Last update: ${floodedPolygonData.timeMessageChanged}`);
+//     console.log(`Polygon area: ${floodedPolygonData.polygonData[0].area}`);
+//     console.log(`Polygon description: ${floodedPolygonData.polygonData[0].description}`);
+//   } else {
+//     console.log('The user is safe');
+//   }
+// };
+
+
+export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
   const result = await chrome.storage.local.get(['userLocation']);
   const savedLocation = result.userLocation;
 
@@ -337,12 +519,10 @@ export const isUserFlooded = async () => {
   const userLocation = point([savedLocation[1], savedLocation[0]]);
   console.log('user location in service:', userLocation);
 
-  const floodData: FloodWithPolygonData[] = await logPolygonsFromFloodWarnings();
   console.log('floodData inside isUserFlooded:', floodData);
 
   let isFlooded = false;
   let floodedPolygonData: FloodWithPolygonData | null = null;
-
 
   for (const flood of floodData) {
     for (const polygonData of flood.polygonData) {
@@ -371,7 +551,6 @@ export const isUserFlooded = async () => {
     }
     if (isFlooded) break;
   }
-
 
   if (isFlooded && floodedPolygonData) {
     console.log('The user is flooded here:');

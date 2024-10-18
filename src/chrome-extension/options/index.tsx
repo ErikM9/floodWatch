@@ -41,7 +41,7 @@ import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 import UkMap from '../app-components/Map';
-import { getAndLogFloodData, isUserFlooded, logPolygonsFromFloodWarnings } from '../services/FloodDataService'
+// import { getAndLogFloodData, isUserFlooded, logPolygonsFromFloodWarnings } from '../services/FloodDataService'
 const formSchema = z.object({
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
@@ -69,15 +69,15 @@ const Options = () => {
 
 
   // Call flood-related functions only once when the component mounts
-  useEffect(() => {
-    getAndLogFloodData((floodData) => {
-      console.log('flood data from option page', floodData);
-    });
+  // useEffect(() => {
+  //   getAndLogFloodData((floodData) => {
+  //     console.log('flood data from option page', floodData);
+  //   });
 
-    logPolygonsFromFloodWarnings();
-    // formatPolygonData();
-    isUserFlooded();
-  }, []); // Empty dependency array to ensure this runs only once on mount
+  //   logPolygonsFromFloodWarnings();
+  //   // formatPolygonData();
+  //   isUserFlooded();
+  // }, []); // Empty dependency array to ensure this runs only once on mount
 
   useEffect(() => {
     const loadSavedLocation = async () => {
