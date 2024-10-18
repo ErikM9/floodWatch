@@ -285,6 +285,8 @@ async function storeFloodWarnings() {
     chrome.storage.local.get('floodData', (result) => {
       const storedFloodData = result.floodData || [];
 
+      console.log('this is flood data', typeof storedFloodData)
+
       const isDataChanged = JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
 
       if (isDataChanged) {
@@ -326,3 +328,30 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 });
+
+
+
+
+function openDatabase(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('UkFloodWarningDB', 1);
+
+    request.onerror = (event) => {
+      reject(`database error: ${(event.target as IDBRequest).error}`);
+    };
+
+    request.onsuccess = (event) => {
+      resolve((event.target as IDBRequest).result);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBRequest).result;
+      if (!db.objectStoreNames.contains('floodData')) {
+        db.createObjectStore('floodData', { keyPath: 'id' });
+        console.log('created object store: floodData');
+      }
+    };
+  });
+}
+
+openDatabase()

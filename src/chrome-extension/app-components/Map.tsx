@@ -46,7 +46,7 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
     const loadPolygons = async () => {
       try {
         const polygonData = await fetchFloodData();
-        console.log("Raw flood data:", JSON.stringify(polygonData, null, 2));
+        // console.log("Raw flood data:", JSON.stringify(polygonData, null, 2));
 
         const geoJson = processPolygons(polygonData);
 

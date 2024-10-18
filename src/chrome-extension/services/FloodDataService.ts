@@ -287,10 +287,13 @@ export function getAndLogFloodData(callback: (floodData: any[]) => void): void {
 
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
   const allFloodData: any[] = [];
+  console.log('allFloodData:', allFloodData)
 
   return new Promise((resolve) => {
     getAndLogFloodData((floodData) => {
       allFloodData.length = 0;
+      // TODO make sure that floodData is an array
+      console.log('floodData in service of XXXX', floodData)
       floodData.forEach((flood) => {
         const {
           id,

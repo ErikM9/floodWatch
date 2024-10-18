@@ -62,8 +62,10 @@ interface PolygonResponse {
 
 // URL for the floods and polygons API endpoints
 const floodAPI = 'https://environment.data.gov.uk/flood-monitoring/id/floods';
+// const floodAPI = 'http://localhost:3000/items';
 console.log('flood API', floodAPI)
 const polygonAPIBase = 'https://environment.data.gov.uk/flood-monitoring/id/floodAreas';
+// const polygonAPIBase = 'http://localhost:3000/floodAreas';
 
 // Function to extract the flood warning details
 export async function fetchFloodWarnings(): Promise<any[]> {
@@ -102,7 +104,7 @@ export async function fetchPolygonData(floodAreaID: string): Promise<any> {
   try {
     const response = await axios.get<PolygonResponse>(polygonEndpoint);
     const polygonData = response.data;
-    console.log("polygon end point:", polygonData)
+    // console.log("polygon end point:", polygonData)
     return extractCoordinates(polygonData);
   } catch (error) {
     console.error(`Error fetching polygon for flood area ${floodAreaID}:`, error);
@@ -139,4 +141,3 @@ export function extractCoordinates(polygonData: PolygonResponse): any[] {
 
   return polygons;
 }
-

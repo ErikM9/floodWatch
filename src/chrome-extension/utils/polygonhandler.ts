@@ -90,7 +90,6 @@ export function processPolygons(polygonData: any): GeoJSONFeatureCollection {
               });
             });
 
-            console.log('Coordinates should be in [lon, lat]:', validCoords);
             return validCoords;
           }),
         },
