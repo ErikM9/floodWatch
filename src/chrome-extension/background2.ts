@@ -83,23 +83,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-
-
-
-
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes.userLocation) {
     console.log('user location changed', changes.userLocation.newValue);
     checkIfUserIsFlooded()
   }
 })
-
-
-
-chrome.runtime.onStartup.addListener(() => {
-  console.log("chrome has started, checking if user is flooded...");
-  checkIfUserIsFlooded();
-});
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("extension installed or updated, checking flood status...");
@@ -108,9 +97,14 @@ chrome.runtime.onInstalled.addListener(() => {
 
 
 function checkIfUserIsFlooded() {
+  console.log('checkIfUserIsFlooded invoked');
   getAndLogFloodData((floodData) => {
     isUserFlooded(floodData);
   });
 }
 
-// checkIfUserIsFlooded()
+chrome.runtime.onStartup.addListener(() => {
+  console.log("chrome has started, checking if user is flooded...");
+  checkIfUserIsFlooded();
+});
+

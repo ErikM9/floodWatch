@@ -119,14 +119,7 @@ export function extractCoordinates(polygonData: PolygonResponse): any[] {
   // Iterate through the features and handle each one
   const polygons = features.map(feature => {
     const geometryType = feature.geometry.type;
-    // let coordinates: number[][] = [];
 
-    // if (geometryType === 'Polygon') {
-    //   coordinates = feature.geometry.coordinates[0] as number[][]; // Extract the first set of coordinates in Polygon
-    // } else if (geometryType === 'MultiPolygon') {
-    //   // Handle multiple polygons (each sub-polygon has a separate set of coordinates)
-    //   coordinates = (feature.geometry.coordinates as number[][][]).map(polygon => polygon[0]);
-    // }
 
     return {
       area: feature.properties.AREA,
@@ -135,7 +128,7 @@ export function extractCoordinates(polygonData: PolygonResponse): any[] {
         type: geometryType,
         coordinates: feature.geometry.coordinates
       },
-      // coordinates: coordinates // Extracted coordinates for the polygon or multipolygon
+
     };
   });
 
