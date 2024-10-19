@@ -42,6 +42,8 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
 
   const [geoJsonData, setGeoJsonData] = useState<GeoJSONFeatureCollection | null>(null);
 
+
+
   useEffect(() => {
     const loadPolygons = async () => {
       try {

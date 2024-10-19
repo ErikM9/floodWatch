@@ -1,8 +1,7 @@
-
-
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { point } from '@turf/helpers';
-
+import { getFloodWarningsFromDB } from '../background2';
+import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
 
 
 interface PolygonData {
@@ -22,7 +21,6 @@ interface PolygonDataTwo {
     coordinates: number[][][] | number[][][][];
   };
 }
-
 
 interface FloodWarning {
   id: string;
@@ -47,8 +45,6 @@ interface FloodWithPolygonData {
   riverOrSea: string;
   timeMessageChanged: string;
 }
-
-import { getFloodWarningsFromDB } from '../background2';
 
 let listenerAdded = false;
 
@@ -180,4 +176,38 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
   } else {
     console.log('The user is safe');
   }
+};
+
+getAndLogFloodData((floodData) => {
+  MapPolygon(floodData);
+});
+
+
+export const MapPolygon = (floodData: FloodWarning[]): FeatureCollection => {
+  return {
+    type: 'FeatureCollection',
+    features: floodData.map((data): Feature => {
+      const geometry = data.polygonData[0].geometry;
+
+      if (geometry.type === 'Polygon') {
+        return {
+          type: 'Feature',
+          properties: {
+            severityLevel: data.severityLevel,
+          },
+          geometry: geometry as Polygon,
+        };
+      } else if (geometry.type === 'MultiPolygon') {
+        return {
+          type: 'Feature',
+          properties: {
+            severityLevel: data.severityLevel,
+          },
+          geometry: geometry as MultiPolygon,
+        };
+      } else {
+        throw new Error(`unsupported geometry type: ${geometry.type}`);
+      }
+    }).filter(feature => feature !== undefined),
+  };
 };

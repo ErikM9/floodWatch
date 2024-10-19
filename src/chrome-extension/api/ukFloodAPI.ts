@@ -59,11 +59,11 @@ export default async function fetchFloodData() {
     console.log("flood description:", floodDescriptions);
     console.log("flood area name:", floodAreaNames);
 
-    polygons.map(polygon => {
-      polygon.map(p => {
-        console.log("polygon coordinates:", p.coordinates)
-      })
-    })
+    // polygons.map(polygon => {
+    //   polygon.map(p => {
+    //     console.log("polygon coordinates:", p.coordinates)
+    //   })
+    // })
 
     return polygons;
   } catch (error) {

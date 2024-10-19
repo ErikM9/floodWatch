@@ -19,6 +19,7 @@ import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 import UkMap from '../app-components/Map';
+import UkMap2 from '../app-components/Map2';
 
 const formSchema = z.object({
   address: z.string().min(5, {
@@ -108,6 +109,7 @@ const Options = () => {
       <section className='mx-16'>
         <div>
           <UkMap userLocation={userLocation} />
+          <UkMap2 />
         </div>
         <div>
           <Form {...form}>
