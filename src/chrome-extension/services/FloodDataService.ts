@@ -179,7 +179,7 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
   }
 
   if (isFlooded && floodedPolygonData) {
-    console.log(floodedPolygonData.message);
+    console.log('message from service:', floodedPolygonData.message);
   } else {
     console.log('The user is safe');
   }

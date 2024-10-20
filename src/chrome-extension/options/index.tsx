@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input"
 import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
-import UkMap from '../app-components/Map';
 import UkMap2 from '../app-components/Map2';
 
 const formSchema = z.object({
@@ -108,7 +107,6 @@ const Options = () => {
       </header>
       <section className='mx-16'>
         <div>
-          <UkMap userLocation={userLocation} />
           <UkMap2 userLocation={userLocation} />
         </div>
         <div>
