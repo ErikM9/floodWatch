@@ -54,6 +54,13 @@ export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void
   getFloodWarningsFromDB()
     .then((floodData) => {
       console.log('floodData from service IndexedDB T', floodData);
+
+      // const geoJsonData = MapPolygon(floodData);
+
+      // console.log('GeoJSON Data:', geoJsonData); // Log processed GeoJSON data
+
+
+
       callback(floodData);
     })
     .catch((error) => {

@@ -90,9 +90,30 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 })
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onStartup.addListener(() => {
+  console.log("chrome has started, checking if it's the first run...");
+
+  chrome.storage.local.get('isFirstRun', async (result) => {
+    if (!result.isFirstRun) {
+
+      console.log('This is the first time Chrome is opened, triggering storeFloodWarnings...');
+
+      await storeFloodWarnings();
+
+      chrome.storage.local.set({ isFirstRun: true });
+    } else {
+      console.log('Not the first time, skipping storeFloodWarnings.');
+    }
+  });
+});
+
+chrome.runtime.onInstalled.addListener(async () => {
   console.log("extension installed or updated, checking flood status...");
+
   checkIfUserIsFlooded();
+  await storeFloodWarnings();
+
+  chrome.storage.local.set({ isFirstRun: false });
 });
 
 
