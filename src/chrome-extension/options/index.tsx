@@ -109,7 +109,7 @@ const Options = () => {
       <section className='mx-16'>
         <div>
           <UkMap userLocation={userLocation} />
-          <UkMap2 />
+          <UkMap2 userLocation={userLocation} />
         </div>
         <div>
           <Form {...form}>
