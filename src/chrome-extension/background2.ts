@@ -49,7 +49,7 @@ export async function getFloodWarningsFromDB(): Promise<any> {
     };
 
     request.onsuccess = () => {
-      resolve((request.result)?.data || []);
+      resolve(request.result?.data || []);
     };
   });
 }
@@ -62,7 +62,8 @@ async function storeFloodWarnings(): Promise<void> {
     const storedFloodData = await getFloodWarningsFromDB();
     console.log('stored flood data from indexedDB:', storedFloodData);
 
-    const isDataChanged = JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
+    const isDataChanged =
+      JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
 
     if (isDataChanged) {
       await storeFloodWarningsInDB(floodWarnings);
@@ -86,17 +87,18 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes.userLocation) {
     console.log('user location changed', changes.userLocation.newValue);
-    checkIfUserIsFlooded()
+    checkIfUserIsFlooded();
   }
-})
+});
 
 chrome.runtime.onStartup.addListener(() => {
   console.log("chrome has started, checking if it's the first run...");
 
   chrome.storage.local.get('isFirstRun', async (result) => {
     if (!result.isFirstRun) {
-
-      console.log('This is the first time Chrome is opened, triggering storeFloodWarnings...');
+      console.log(
+        'This is the first time Chrome is opened, triggering storeFloodWarnings...'
+      );
 
       await storeFloodWarnings();
 
@@ -108,14 +110,13 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("extension installed or updated, checking flood status...");
+  console.log('extension installed or updated, checking flood status...');
 
   checkIfUserIsFlooded();
   await storeFloodWarnings();
 
   chrome.storage.local.set({ isFirstRun: false });
 });
-
 
 function checkIfUserIsFlooded() {
   console.log('checkIfUserIsFlooded invoked');
@@ -125,7 +126,6 @@ function checkIfUserIsFlooded() {
 }
 
 chrome.runtime.onStartup.addListener(() => {
-  console.log("chrome has started, checking if user is flooded...");
+  console.log('chrome has started, checking if user is flooded...');
   checkIfUserIsFlooded();
 });
-

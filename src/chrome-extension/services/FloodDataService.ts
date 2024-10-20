@@ -1,8 +1,7 @@
-import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import { getFloodWarningsFromDB } from '../background2';
 import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
-
 
 interface PolygonData {
   area: string;
@@ -48,8 +47,10 @@ interface FloodWithPolygonData {
 
 let listenerAdded = false;
 
-export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void): void {
-  console.log("getAndLogFloodData invoked");
+export function getAndLogFloodData(
+  callback: (floodData: FloodWarning[]) => void
+): void {
+  console.log('getAndLogFloodData invoked');
 
   getFloodWarningsFromDB()
     .then((floodData) => {
@@ -58,8 +59,6 @@ export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void
       // const geoJsonData = MapPolygon(floodData);
 
       // console.log('GeoJSON Data:', geoJsonData); // Log processed GeoJSON data
-
-
 
       callback(floodData);
     })
@@ -72,7 +71,10 @@ export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void
     setInterval(() => {
       getFloodWarningsFromDB()
         .then((updatedFloodData) => {
-          console.log('Updated flood data detected in service IndexedDB', updatedFloodData);
+          console.log(
+            'Updated flood data detected in service IndexedDB',
+            updatedFloodData
+          );
           callback(updatedFloodData);
 
           if (updatedFloodData.length > 0) {
@@ -80,23 +82,25 @@ export function getAndLogFloodData(callback: (floodData: FloodWarning[]) => void
           }
         })
         .catch((error) => {
-          console.error('Error fetching updated flood data from IndexedDB', error);
+          console.error(
+            'Error fetching updated flood data from IndexedDB',
+            error
+          );
         });
     }, 900000); // 15min interval
     listenerAdded = true;
   }
 }
 
-
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
-  const allFloodData: any[] = [];
-  console.log('allFloodData:', allFloodData)
+  const allFloodData: FloodWarning[] = [];
+  console.log('allFloodData:', allFloodData);
 
   return new Promise((resolve) => {
     getAndLogFloodData((floodData) => {
       allFloodData.length = 0;
       // TODO make sure that floodData is an array
-      console.log('floodData in service of XXXX', floodData)
+      console.log('floodData in service of XXXX', floodData);
       floodData.forEach((flood) => {
         const {
           id,
@@ -107,7 +111,7 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged,
+          timeMessageChanged
         } = flood;
 
         allFloodData.push({
@@ -119,7 +123,7 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged,
+          timeMessageChanged
         });
       });
 
@@ -127,7 +131,6 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
     });
   });
 }
-
 
 let isUserFloodedCallCount = 0;
 
@@ -157,7 +160,12 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
       if (geometry.type === 'Polygon') {
         const polygonCoordinates = geometry.coordinates as number[][][];
 
-        if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygonCoordinates })) {
+        if (
+          booleanPointInPolygon(userLocation, {
+            type: 'Polygon',
+            coordinates: polygonCoordinates
+          })
+        ) {
           isFlooded = true;
           floodedPolygonData = flood;
           break;
@@ -166,7 +174,12 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
         const multiPolygonCoordinates = geometry.coordinates as number[][][][];
 
         for (const polygon of multiPolygonCoordinates) {
-          if (booleanPointInPolygon(userLocation, { type: 'Polygon', coordinates: polygon })) {
+          if (
+            booleanPointInPolygon(userLocation, {
+              type: 'Polygon',
+              coordinates: polygon
+            })
+          ) {
             isFlooded = true;
             floodedPolygonData = flood;
             break;
@@ -189,32 +202,33 @@ getAndLogFloodData((floodData) => {
   MapPolygon(floodData);
 });
 
-
 export const MapPolygon = (floodData: FloodWarning[]): FeatureCollection => {
   return {
     type: 'FeatureCollection',
-    features: floodData.map((data): Feature => {
-      const geometry = data.polygonData[0].geometry;
+    features: floodData
+      .map((data): Feature => {
+        const geometry = data.polygonData[0].geometry;
 
-      if (geometry.type === 'Polygon') {
-        return {
-          type: 'Feature',
-          properties: {
-            severityLevel: data.severityLevel,
-          },
-          geometry: geometry as Polygon,
-        };
-      } else if (geometry.type === 'MultiPolygon') {
-        return {
-          type: 'Feature',
-          properties: {
-            severityLevel: data.severityLevel,
-          },
-          geometry: geometry as MultiPolygon,
-        };
-      } else {
-        throw new Error(`unsupported geometry type: ${geometry.type}`);
-      }
-    }).filter(feature => feature !== undefined),
+        if (geometry.type === 'Polygon') {
+          return {
+            type: 'Feature',
+            properties: {
+              severityLevel: data.severityLevel
+            },
+            geometry: geometry as Polygon
+          };
+        } else if (geometry.type === 'MultiPolygon') {
+          return {
+            type: 'Feature',
+            properties: {
+              severityLevel: data.severityLevel
+            },
+            geometry: geometry as MultiPolygon
+          };
+        } else {
+          throw new Error(`unsupported geometry type: ${geometry.type}`);
+        }
+      })
+      .filter((feature) => feature !== undefined)
   };
 };

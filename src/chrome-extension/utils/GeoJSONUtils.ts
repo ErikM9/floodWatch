@@ -2,8 +2,11 @@ import { FeatureCollection, Geometry } from 'geojson';
 
 export function convertToGeoJSON(fetchedPolygons: any[]): FeatureCollection {
   const features = fetchedPolygons.map((polygonData) => {
-
-    const geometryType: 'Polygon' | 'MultiPolygon' = Array.isArray(polygonData.coordinates[0][0]) ? 'MultiPolygon' : 'Polygon';
+    const geometryType: 'Polygon' | 'MultiPolygon' = Array.isArray(
+      polygonData.coordinates[0][0]
+    )
+      ? 'MultiPolygon'
+      : 'Polygon';
 
     return {
       type: 'Feature' as const,

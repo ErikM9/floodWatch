@@ -1,8 +1,8 @@
 // import React from "react";
 // import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
 // import "leaflet/dist/leaflet.css";
-import { Icon, LatLngTuple } from "leaflet";
-import { MapUpdater } from "./MapUpdater"
+import { Icon, LatLngTuple } from 'leaflet';
+import { MapUpdater } from './MapUpdater';
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from 'react-leaflet';
@@ -26,7 +26,7 @@ interface GeoJSONFeature {
 }
 
 interface GeoJSONFeatureCollection {
-  type: "FeatureCollection";
+  type: 'FeatureCollection';
   features: GeoJSONFeature[];
 }
 
@@ -36,13 +36,12 @@ interface MapProps {
 
 // const UkMap = () => {
 const UkMap: React.FC<MapProps> = ({ userLocation }) => {
-  const ukCenter: LatLngTuple = [54.00, -2.00];
+  const ukCenter: LatLngTuple = [54.0, -2.0];
   const center = userLocation || ukCenter;
   const zoom = userLocation ? 13 : 5.4;
 
-  const [geoJsonData, setGeoJsonData] = useState<GeoJSONFeatureCollection | null>(null);
-
-
+  const [geoJsonData, setGeoJsonData] =
+    useState<GeoJSONFeatureCollection | null>(null);
 
   useEffect(() => {
     const loadPolygons = async () => {
@@ -70,13 +69,10 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
         //             return [];
         //           }
 
-
         //           const validCoords = p.coordinates.map((coordSet: any, coordSetIndex: number) => {
         //             console.log(` ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
 
-
         //             const coords = Array.isArray(coordSet[0]) ? coordSet[0] : coordSet;
-
 
         //             return coords.filter((point: any) => {
         //               return Array.isArray(point) && point.length === 2 && !isNaN(point[0]) && !isNaN(point[1]);
@@ -99,7 +95,6 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
 
         // console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
         setGeoJsonData(geoJson);
-
       } catch (error) {
         console.error('Error fetching or processing polygon data:', error);
       }
@@ -123,44 +118,38 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
   //   );
   // }
 
-
-
-
   const customIcon = new Icon({
-
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconUrl:
+      'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    shadowUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
-  })
+  });
 
   return (
     <MapContainer
       center={center}
       zoom={zoom}
-      style={{ height: "50vh", width: "100%" }}
-    >
+      style={{ height: '50vh', width: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {
-        geoJsonData && (
-          <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
-        )
-      }
+      {geoJsonData && (
+        <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
+      )}
 
       <MapUpdater center={center} zoom={zoom} />
       {userLocation && (
         <Marker position={userLocation} icon={customIcon}>
           <Popup>Your location</Popup>
         </Marker>
-      )
-      }
-    </MapContainer >
+      )}
+    </MapContainer>
   );
 };
 

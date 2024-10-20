@@ -1,7 +1,6 @@
 // import fetchFloodData from './api/ukFloodAPI';
 // import * as turf from "@turf/turf"
 
-
 // async function checkUserLocation(userLocation: { lat: number, lon: number }) {
 //   try {
 //     const polygons = await fetchFloodData();
@@ -34,7 +33,6 @@
 // //   const userPoint = turf.point([userLocation.lon, userLocation.lat])
 // // }
 // fetchFloodData();
-
 
 // // function getUserLocationFromStorage(callback) {
 // //   chrome.storage.local.get(['userLocation'], ())
@@ -121,9 +119,6 @@
 //       console.log('Latitude:', extractedLocation[0]);
 //       console.log('Longitude:', extractedLocation[1]);
 
-
-
-
 //       // const userLocationObj = result.userLocation;
 //       // const userLocationArr = Object.entries(userLocationObj);
 //       // const extractedLocation = userLocationArr.map(item => item[1]);
@@ -148,7 +143,6 @@
 
 // // Initial check for user location when the background script starts
 // getUserLocationAndCheck();
-
 
 // import fetchFloodData from './api/ukFloodAPI';
 // import { point } from "@turf/helpers";  // Import point creation
@@ -206,7 +200,6 @@
 // //   });
 // // }
 
-
 // // Function to get and log the user location, then check against polygons
 // function getUserLocationAndCheck() {
 //   chrome.storage.local.get(['userLocation'], function (result) {
@@ -231,8 +224,6 @@
 //     }
 //   });
 // }
-
-
 
 // // Listen for changes in storage and trigger location checking
 // chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -272,10 +263,7 @@
 // // Trigger the function to log polygons
 // logPolygonsFromFloodWarnings();
 
-
-
 // import { fetchFloodWarnings } from './api/testApi';
-
 
 // async function storeFloodWarnings() {
 //   try {
@@ -305,7 +293,6 @@
 //   }
 // }
 
-
 // chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
 
 // chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -314,9 +301,7 @@
 //   }
 // });
 
-
 // storeFloodWarnings();
-
 
 // chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 //   if (message.type === 'getFloodData') {
@@ -328,9 +313,3 @@
 //     return true;
 //   }
 // });
-
-
-
-
-
-

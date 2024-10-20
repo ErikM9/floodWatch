@@ -2,7 +2,10 @@ import { LatLngTuple } from 'leaflet';
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 
-export const MapUpdater: React.FC<{ center: LatLngTuple, zoom: number }> = ({ center, zoom }) => {
+export const MapUpdater: React.FC<{ center: LatLngTuple; zoom: number }> = ({
+  center,
+  zoom
+}) => {
   const map = useMap();
 
   useEffect(() => {
@@ -11,4 +14,3 @@ export const MapUpdater: React.FC<{ center: LatLngTuple, zoom: number }> = ({ ce
 
   return null;
 };
-

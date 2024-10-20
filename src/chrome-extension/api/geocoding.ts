@@ -1,16 +1,18 @@
 export type GeocodingLocation = {
   latitude: number;
   longitude: number;
-}
+};
 
-export async function userAddress(address: string): Promise<GeocodingLocation | null> {
+export async function userAddress(
+  address: string
+): Promise<GeocodingLocation | null> {
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=gb`;
 
   try {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Could not fetch geocoding data: ${response.statusText}`)
+      throw new Error(`Could not fetch geocoding data: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -20,10 +22,10 @@ export async function userAddress(address: string): Promise<GeocodingLocation | 
       return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
     } else {
       console.warn('No results found for the given address');
-      return null
+      return null;
     }
   } catch (error) {
-    console.error('Geocoding error: ', error)
-    return null
+    console.error('Geocoding error: ', error);
+    return null;
   }
 }
