@@ -1,4 +1,4 @@
-const floodResponse = {
+export const floodResponse = {
   '@context': 'https://environment.data.gov.uk/flood-monitoring/id/floods',
   meta: {
     publisher: 'Environment Agency',
@@ -30,7 +30,27 @@ const floodResponse = {
       severity: 'Warning',
       severityLevel: 3,
       timeMessageChanged: '2024-11-14T08:30:00Z',
-      timeRaised: '2024-11-14T07:00:00Z'
+      timeRaised: '2024-11-14T07:00:00Z',
+      // Adding polygonData to match FloodWarning interface
+      polygonData: [
+        {
+          area: 'River Thames Area',
+          description: 'Flooding possible along River Thames',
+          geometry: {
+            type: 'MultiPolygon',
+            coordinates: [
+              [
+                [
+                  [-1.5, 51.8],
+                  [-1.3, 51.7],
+                  [-1.2, 51.8],
+                  [-1.5, 51.8]
+                ]
+              ]
+            ]
+          }
+        }
+      ]
     },
     {
       '@id': 'floodItem-2',
@@ -52,12 +72,32 @@ const floodResponse = {
       severity: 'Severe Warning',
       severityLevel: 1,
       timeMessageChanged: '2024-11-14T09:00:00Z',
-      timeRaised: '2024-11-14T08:00:00Z'
+      timeRaised: '2024-11-14T08:00:00Z',
+      // Adding polygonData to match FloodWarning interface
+      polygonData: [
+        {
+          area: 'River Severn Area',
+          description: 'Severe flood warning along River Severn',
+          geometry: {
+            type: 'MultiPolygon',
+            coordinates: [
+              [
+                [
+                  [-2.2, 52.0],
+                  [-2.1, 51.9],
+                  [-2.0, 52.1],
+                  [-2.2, 52.0]
+                ]
+              ]
+            ]
+          }
+        }
+      ]
     }
   ]
 };
 
-const polygonResponse = {
+export const polygonResponse = {
   type: 'FeatureCollection',
   features: [
     {
