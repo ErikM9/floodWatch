@@ -2,46 +2,30 @@
   "manifest_version": 3,
   "name": "FloodWatch",
   "version": "1.0.0",
-  "action": {
-    "default_popup": "popup.html"
-  },
-  "options_page": "options.html",
   "description": "This extension alerts UK based users about floods based on their location.",
   "icons": {
     "32": "public/32.png"
   },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": [
-        "public/logo.png"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "resources": ["public/logo.png", "public/32.png"],
+      "matches": ["<all_urls>"]
     }
   ],
-  "permissions": [
-    "geolocation",
-    "storage",
-    "notifications",
-    "alarms",
-    "storage"
-  ],
+  "permissions": ["geolocation", "storage", "notifications", "alarms"],
   "background": {
     "service_worker": "background2.js",
     "type": "module"
   },
-  "host_permissions": [
-    "https://environment.data.gov.uk/*"
-  ],
+  "host_permissions": ["https://environment.data.gov.uk/*"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
     }
   ]
 }

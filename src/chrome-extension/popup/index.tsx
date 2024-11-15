@@ -1,33 +1,32 @@
 //
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import '../global.css';
 import { Settings2 } from 'lucide-react';
 import logoImage from './../public/logo.png';
-import { useEffect, useState } from 'react';
-import { Power, PowerOff } from 'lucide-react';
+// import { useEffect, useState } from 'react';
+// import { Power, PowerOff } from 'lucide-react';
 
 export const Popup = () => {
-  const [notifsEnabled, setNotifsEnabled] = useState(false);
-  const [floodWarnings, setFloodWarnings] = useState<any[]>([]);
-  const [popupVisible, setPopupVisible] = useState(false);
+  // const [notifsEnabled, setNotifsEnabled] = useState(false);
+  // const [floodWarnings, setFloodWarnings] = useState<any[]>([]);
+  // const [popupVisible, setPopupVisible] = useState(false);
 
-  useEffect(() => {
-    chrome.storage.local.get(['notifsEnabled'], (result) => {
-      if (typeof result.notifsEnabled === 'boolean') {
-        setNotifsEnabled(result.notifsEnabled);
-      }
-    });
+  // useEffect(() => {
+  //   chrome.storage.local.get(['notifsEnabled'], (result) => {
+  //     if (typeof result.notifsEnabled === 'boolean') {
+  //       setNotifsEnabled(result.notifsEnabled);
+  //     }
+  //   });
 
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === 'FLOOD_ALERT') {
-        if (notifsEnabled) {
-          setFloodWarnings(message.data);
-          setPopupVisible(true);
-        }
-      }
-    });
-  }, [notifsEnabled]);
+  //   chrome.runtime.onMessage.addListener((message) => {
+  //     if (message.type === 'FLOOD_ALERT') {
+  //       if (notifsEnabled) {
+  //         setFloodWarnings(message.data);
+  //         setPopupVisible(true);
+  //       }
+  //     }
+  //   });
+  // }, [notifsEnabled]);
 
   const openOptionsPage = () => {
     if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
@@ -35,11 +34,20 @@ export const Popup = () => {
     }
   };
 
-  const toggleNotifs = () => {
-    const updatedNotifsEnabled = !notifsEnabled;
-    setNotifsEnabled(updatedNotifsEnabled);
-    chrome.storage.local.set({ notifsEnabled: updatedNotifsEnabled });
-  };
+  chrome.runtime.onMessage.addListener((message) => {
+    console.log('Message received in popup:', message);
+
+    if (message.type === 'update_popup') {
+      const popupMessage = message.data;
+      console.log('Popup message data:', popupMessage);
+    }
+  });
+
+  // const toggleNotifs = () => {
+  //   const updatedNotifsEnabled = !notifsEnabled;
+  //   setNotifsEnabled(updatedNotifsEnabled);
+  //   chrome.storage.local.set({ notifsEnabled: updatedNotifsEnabled });
+  // };
 
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
@@ -56,7 +64,7 @@ export const Popup = () => {
               onClick={openOptionsPage}
             />
           </li>
-          <li className="pt-2">
+          {/* <li className="pt-2">
             <button onClick={toggleNotifs} className="flex items-center">
               {notifsEnabled ? (
                 <span className="text-green-500">
@@ -68,28 +76,9 @@ export const Popup = () => {
                 </span>
               )}
             </button>
-          </li>
+          </li> */}
         </ul>
       </header>
-
-      {popupVisible && (
-        <section className="flood-data mx-10 mt-4">
-          <h4 className="text-lg font-bold text-blue-700">Flood Alerts</h4>
-          {floodWarnings.length > 0 ? (
-            <ul>
-              {floodWarnings.map((flood, index) => (
-                <li key={index}>
-                  {/* <p>{flood.message}</p> */}
-                  <p>{flood.description}</p>
-                  <p>{flood.severity}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No flood alerts in your area.</p>
-          )}
-        </section>
-      )}
     </div>
   );
 };
