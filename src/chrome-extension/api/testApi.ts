@@ -137,29 +137,17 @@
 //   return polygons;
 // }
 
-// Import the mock data
+// Import mock data
+
 import { floodResponse, polygonResponse } from '../../data/floodMockData';
+import {
+  // FloodResponse,
+  // FloodItem,
+  PolygonResponse,
+  PolygonFeature
+} from '../../data/types';
 
-// Type definitions for polygon features and flood warnings
-interface PolygonFeature {
-  type: string;
-  geometry: {
-    type: string;
-    coordinates: number[][][] | number[][][][];
-  };
-  properties: {
-    AREA: string;
-    FWS_TACODE: string;
-    TA_NAME: string;
-    DESCRIP: string;
-    LA_NAME: string;
-    PARENT: string;
-    QDIAL: string;
-    RIVER_SEA: string;
-  };
-}
-
-interface FloodWarning {
+interface FloodDetails {
   id: string;
   description: string;
   county: string;
@@ -168,68 +156,90 @@ interface FloodWarning {
   severityLevel: number;
   message: string;
   timeMessageChanged: string;
-  polygonData: PolygonCoordinates | null;
+  polygonData: {
+    area: string;
+    description: string;
+    geometry: {
+      type: string;
+      coordinates: number[][][] | number[][][][];
+    };
+  }[];
+  geometry: {
+    type: string;
+    coordinates: number[][][] | number[][][][];
+  } | null;
 }
 
-interface PolygonCoordinates {
+// Function to extract flood warning details using mock data
+export async function fetchFloodWarnings(): Promise<FloodDetails[]> {
+  try {
+    const floods = floodResponse.items; // Use mock flood data
+    const floodWarnings: FloodDetails[] = [];
+
+    for (const flood of floods) {
+      const polygonData = fetchPolygonData(flood.floodAreaID); // Get polygon data
+      const floodDetails: FloodDetails = {
+        id: flood.floodAreaID,
+        description: flood.description,
+        county: flood.floodArea.county,
+        riverOrSea: flood.floodArea.riverOrSea,
+        severity: flood.severity,
+        severityLevel: flood.severityLevel,
+        message: flood.message,
+        timeMessageChanged: flood.timeMessageChanged,
+        polygonData, // Full polygonData array
+        geometry: polygonData?.[0]?.geometry || null // First geometry for easier access
+      };
+      floodWarnings.push(floodDetails);
+    }
+
+    return floodWarnings;
+  } catch (error) {
+    console.error('Error fetching flood warnings:', error);
+    return [];
+  }
+}
+
+// Function to fetch polygon data using mock data
+export function fetchPolygonData(floodAreaID: string): {
   area: string;
   description: string;
   geometry: {
     type: string;
     coordinates: number[][][] | number[][][][];
   };
-}
-
-// Function to extract the flood warning details using mock data
-export function fetchFloodWarnings(): FloodWarning[] {
-  const floods = floodResponse.items;
-  const floodWarnings: FloodWarning[] = [];
-
-  for (const flood of floods) {
-    const floodDetails: FloodWarning = {
-      id: flood.floodAreaID,
-      description: flood.description,
-      county: flood.floodArea.county,
-      riverOrSea: flood.floodArea.riverOrSea,
-      severity: flood.severity,
-      severityLevel: flood.severityLevel,
-      message: flood.message,
-      timeMessageChanged: flood.timeMessageChanged,
-      polygonData: fetchPolygonData(flood.floodAreaID) // Fetch polygon data from mock data
-    };
-    floodWarnings.push(floodDetails);
-  }
-  console.log('Mock flood warnings:', floodWarnings); // For debugging
-  return floodWarnings;
-}
-
-// Function to fetch polygon data directly from mock data
-export function fetchPolygonData(
-  floodAreaID: string
-): PolygonCoordinates | null {
-  // Find the matching polygon based on flood area ID
-  const matchingPolygon = polygonResponse.features.find(
-    (feature) => feature.properties.FWS_TACODE === floodAreaID
+}[] {
+  // Filter features based on the floodAreaID
+  const polygons = polygonResponse.features.filter(
+    (feature: PolygonFeature) => feature.properties.FWS_TACODE === floodAreaID
   );
 
-  if (!matchingPolygon) {
-    console.warn(`No matching polygon found for FloodAreaID: ${floodAreaID}`);
-    return null; // Return null if no polygon data matches
-  }
-
-  return extractCoordinates(matchingPolygon);
+  // Extract relevant data
+  return polygons.map((feature: PolygonFeature) => ({
+    area: feature.properties.AREA,
+    description: feature.properties.DESCRIP,
+    geometry: {
+      type: feature.geometry.type,
+      coordinates: feature.geometry.coordinates
+    }
+  }));
 }
 
-// Function to extract and handle both Polygon and MultiPolygon geometries
-export function extractCoordinates(
-  polygonData: PolygonFeature
-): PolygonCoordinates {
-  return {
-    area: polygonData.properties.AREA,
-    description: polygonData.properties.DESCRIP,
-    geometry: {
-      type: polygonData.geometry.type,
-      coordinates: polygonData.geometry.coordinates
-    }
+// Function to extract coordinates from polygon data
+export function extractCoordinates(polygonData: PolygonResponse): {
+  area: string;
+  description: string;
+  geometry: {
+    type: string;
+    coordinates: number[][][] | number[][][][];
   };
+}[] {
+  return polygonData.features.map((feature: PolygonFeature) => ({
+    area: feature.properties.AREA,
+    description: feature.properties.DESCRIP,
+    geometry: {
+      type: feature.geometry.type,
+      coordinates: feature.geometry.coordinates
+    }
+  }));
 }
