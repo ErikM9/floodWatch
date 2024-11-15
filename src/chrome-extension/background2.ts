@@ -167,7 +167,7 @@ async function checkIfUserIsFlooded() {
         };
 
         // Store the popup message in chrome.storage
-        await chrome.storage.local.set({ lastFloodAlert: popupMessage });
+        chrome.storage.local.set({ lastFloodAlert: popupMessage });
 
         console.log('popup message to be shown:', popupMessage);
         // await showFloodAlert(popupMessage);

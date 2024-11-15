@@ -3,14 +3,22 @@
 import '../global.css';
 import { Settings2 } from 'lucide-react';
 import logoImage from './../public/logo.png';
-// import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import { Power, PowerOff } from 'lucide-react';
+
+interface popupMessage {
+  severityLevel: string;
+  description: string;
+  severity: string;
+}
 
 export const Popup = () => {
   // const [notifsEnabled, setNotifsEnabled] = useState(false);
   // const [floodWarnings, setFloodWarnings] = useState<any[]>([]);
   // const [popupVisible, setPopupVisible] = useState(false);
 
+  const [alertsEnabled, setAlertsEnabled] = useState(false);
+  const [alertData, setAlertData] = useState<popupMessage | null>(null);
   // useEffect(() => {
   //   chrome.storage.local.get(['notifsEnabled'], (result) => {
   //     if (typeof result.notifsEnabled === 'boolean') {
@@ -32,6 +40,21 @@ export const Popup = () => {
     if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage();
     }
+  };
+
+  useEffect(() => {
+    chrome.storage.local.get(['alertsEnabled', 'lastFloodAlert'], (result) => {
+      setAlertsEnabled(result.alertsEnabled ?? false); // Default to false if undefined
+      setAlertData(result.lastFloodAlert ?? null); // Default to null if no alert
+    });
+  }, []);
+
+  const toggleAlerts = () => {
+    const newState = !alertsEnabled;
+    setAlertsEnabled(newState);
+    chrome.storage.local.set({ alertsEnabled: newState }, () => {
+      console.log(`Alerts are now ${newState ? 'ON' : 'OFF'}`);
+    });
   };
 
   chrome.runtime.onMessage.addListener((message) => {
@@ -79,6 +102,44 @@ export const Popup = () => {
           </li> */}
         </ul>
       </header>
+      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif' }}>
+        <h1>Flood Alert</h1>
+        <div style={{ marginBottom: '16px' }}>
+          <h2>Current Alert</h2>
+          {alertData ? (
+            <div>
+              <p>
+                <strong>Severity:</strong> {alertData.severity}
+              </p>
+              <p>
+                <strong>Description:</strong> {alertData.description}
+              </p>
+              <p>
+                <strong>Severity Level:</strong> {alertData.severityLevel}
+              </p>
+            </div>
+          ) : (
+            <p>No active alerts</p>
+          )}
+        </div>
+        <div>
+          <p>
+            Alerts are currently <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
+          </p>
+          <button
+            onClick={toggleAlerts}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: alertsEnabled ? 'red' : 'green',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}>
+            {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
