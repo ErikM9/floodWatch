@@ -1,10 +1,8 @@
-//
-
 import '../global.css';
 import { Settings2 } from 'lucide-react';
 import logoImage from './../public/logo.png';
 import { useEffect, useState } from 'react';
-// import { Power, PowerOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface popupMessage {
   severityLevel: string;
@@ -13,28 +11,8 @@ interface popupMessage {
 }
 
 export const Popup = () => {
-  // const [notifsEnabled, setNotifsEnabled] = useState(false);
-  // const [floodWarnings, setFloodWarnings] = useState<any[]>([]);
-  // const [popupVisible, setPopupVisible] = useState(false);
-
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [alertData, setAlertData] = useState<popupMessage | null>(null);
-  // useEffect(() => {
-  //   chrome.storage.local.get(['notifsEnabled'], (result) => {
-  //     if (typeof result.notifsEnabled === 'boolean') {
-  //       setNotifsEnabled(result.notifsEnabled);
-  //     }
-  //   });
-
-  //   chrome.runtime.onMessage.addListener((message) => {
-  //     if (message.type === 'FLOOD_ALERT') {
-  //       if (notifsEnabled) {
-  //         setFloodWarnings(message.data);
-  //         setPopupVisible(true);
-  //       }
-  //     }
-  //   });
-  // }, [notifsEnabled]);
 
   const openOptionsPage = () => {
     if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
@@ -44,9 +22,26 @@ export const Popup = () => {
 
   useEffect(() => {
     chrome.storage.local.get(['alertsEnabled', 'lastFloodAlert'], (result) => {
-      setAlertsEnabled(result.alertsEnabled ?? false); // Default to false if undefined
-      setAlertData(result.lastFloodAlert ?? null); // Default to null if no alert
+      setAlertsEnabled(result.alertsEnabled ?? false);
+      setAlertData(result.lastFloodAlert ?? null);
     });
+
+    const storageListener = (changes: any, areaName: string) => {
+      if (areaName === 'local') {
+        if (changes.alertsEnabled) {
+          setAlertsEnabled(changes.alertsEnabled.newValue);
+        }
+        if (changes.lastFloodAlert) {
+          setAlertData(changes.lastFloodAlert.newValue);
+        }
+      }
+    };
+
+    chrome.storage.onChanged.addListener(storageListener);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(storageListener);
+    };
   }, []);
 
   const toggleAlerts = () => {
@@ -66,12 +61,6 @@ export const Popup = () => {
     }
   });
 
-  // const toggleNotifs = () => {
-  //   const updatedNotifsEnabled = !notifsEnabled;
-  //   setNotifsEnabled(updatedNotifsEnabled);
-  //   chrome.storage.local.set({ notifsEnabled: updatedNotifsEnabled });
-  // };
-
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
       <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
@@ -87,19 +76,6 @@ export const Popup = () => {
               onClick={openOptionsPage}
             />
           </li>
-          {/* <li className="pt-2">
-            <button onClick={toggleNotifs} className="flex items-center">
-              {notifsEnabled ? (
-                <span className="text-green-500">
-                  <Power />
-                </span>
-              ) : (
-                <span className="text-red-500">
-                  <PowerOff />
-                </span>
-              )}
-            </button>
-          </li> */}
         </ul>
       </header>
       <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif' }}>

@@ -166,15 +166,13 @@ async function checkIfUserIsFlooded() {
           severity: result.floodedPolygonData?.severity || ''
         };
 
-        // Store the popup message in chrome.storage
         chrome.storage.local.set({ lastFloodAlert: popupMessage });
 
-        console.log('popup message to be shown:', popupMessage);
-        // await showFloodAlert(popupMessage);
+        console.log('popup message updated:', popupMessage);
 
-        if (result?.isFlooded) {
-          console.log('Flood detected:', result.floodedPolygonData);
-
+        const { alertsEnabled } =
+          await chrome.storage.local.get('alertsEnabled');
+        if (alertsEnabled) {
           chrome.notifications.create(
             'flood-alert',
             {
@@ -189,9 +187,12 @@ async function checkIfUserIsFlooded() {
               console.log('Notification created with ID:', notificationId);
             }
           );
+        } else {
+          console.log('Alerts are disabled. Skipping notification.');
         }
       } else {
         console.log('No flooding detected.');
+        chrome.storage.local.remove('lastFloodAlert');
       }
     } catch (error) {
       console.error('Error while checking flood status:', error);
@@ -231,19 +232,32 @@ async function checkIfUserIsFlooded() {
 // }
 
 // Set up periodic checks
-chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.alertsEnabled) {
+    const isEnabled = changes.alertsEnabled.newValue;
+    console.log(`Alerts enabled: ${isEnabled}`);
+
+    if (isEnabled) {
+      chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
+      console.log('Flood check alarm created');
+    } else {
+      chrome.alarms.clear('checkFloods');
+      console.log('Flood check alarm cleared');
+    }
+  }
+});
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'checkFloods') {
     console.log('Alarm triggered: Checking flood status');
-    await checkIfUserIsFlooded();
-  }
-});
 
-// Handle notification clicks
-chrome.notifications.onClicked.addListener((notificationId) => {
-  if (notificationId === 'flood-alert') {
-    chrome.runtime.openOptionsPage(); // Redirect user to popup or alert page
+    const { alertsEnabled } = await chrome.storage.local.get('alertsEnabled');
+    if (!alertsEnabled) {
+      console.log('Alerts are disabled. Skipping flood status check.');
+      return;
+    }
+
+    await checkIfUserIsFlooded();
   }
 });
 
