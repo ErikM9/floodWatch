@@ -1,3 +1,5 @@
+// WHEN WORKING WITH THE API
+
 // import axios from 'axios';
 // // import { floodResponse, polygonResponse } from '../../data/floodMockData';
 // // Type definitions for flood warnings and polygon data
@@ -137,15 +139,9 @@
 //   return polygons;
 // }
 
-// Import mock data
-
+// FOR MOCK DATA
 import { floodResponse, polygonResponse } from '../../data/floodMockData';
-import {
-  // FloodResponse,
-  // FloodItem,
-  PolygonResponse,
-  PolygonFeature
-} from '../../data/types';
+import { PolygonResponse, PolygonFeature } from '../../data/types';
 
 interface FloodDetails {
   id: string;
