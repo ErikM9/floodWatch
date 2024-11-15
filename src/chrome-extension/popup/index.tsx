@@ -79,7 +79,6 @@ export const Popup = () => {
         </ul>
       </header>
       <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif' }}>
-        <h1>Flood Alert</h1>
         <div style={{ marginBottom: '16px' }}>
           <h2>Current Alert</h2>
           {alertData ? (
@@ -102,18 +101,13 @@ export const Popup = () => {
           <p>
             Alerts are currently <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
           </p>
-          <button
+          <Button
             onClick={toggleAlerts}
             style={{
-              padding: '8px 16px',
-              backgroundColor: alertsEnabled ? 'red' : 'green',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              backgroundColor: alertsEnabled ? 'red' : 'green'
             }}>
             {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
