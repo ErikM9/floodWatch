@@ -1,6 +1,6 @@
 import '../global.css';
 import { Mail } from 'lucide-react';
-import logoImage from './../public/logo.png';
+import logoImage from './../public/logo.svg';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';

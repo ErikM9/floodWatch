@@ -1,6 +1,6 @@
 import '../global.css';
 import { Settings2 } from 'lucide-react';
-import logoImage from './../public/logo.png';
+import logoImage from './../public/logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -64,9 +64,12 @@ export const Popup = () => {
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
       <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex flex-row">
-          <img src={logoImage} className="w-10" alt="FloodWatch icon" />
-          <h4 className="text-xl font-bold text-blue-700 px-3">FloodWatch</h4>
+        <div className="flex w-[100px] flex-row items-center justify-center">
+          <img
+            src={logoImage}
+            className="w-full h-full object-contain"
+            alt="FloodWatch icon"
+          />
         </div>
         <ul className="flex items-center">
           <li className="pt-2">

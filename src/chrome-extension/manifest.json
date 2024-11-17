@@ -12,7 +12,14 @@
   "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": ["public/logo.png", "public/32.png"],
+      "resources": [
+        "public/logo.svg",
+        "public/16.png",
+        "public/32.png",
+        "public/48.png",
+        "public/128.png",
+        "public/192.png"
+      ],
       "matches": ["<all_urls>"]
     }
   ],
