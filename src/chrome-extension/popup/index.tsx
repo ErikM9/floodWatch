@@ -21,9 +21,9 @@ export const Popup = () => {
   };
 
   useEffect(() => {
-    chrome.storage.local.get(['alertsEnabled', 'lastFloodAlert'], (result) => {
+    chrome.storage.local.get(['alertsEnabled', 'lastSentAlert'], (result) => {
       setAlertsEnabled(result.alertsEnabled ?? false);
-      setAlertData(result.lastFloodAlert ?? null);
+      setAlertData(result.lastSentAlert ?? null);
     });
 
     const storageListener = (changes: any, areaName: string) => {
@@ -31,8 +31,8 @@ export const Popup = () => {
         if (changes.alertsEnabled) {
           setAlertsEnabled(changes.alertsEnabled.newValue);
         }
-        if (changes.lastFloodAlert) {
-          setAlertData(changes.lastFloodAlert.newValue);
+        if (changes.lastSentAlert) {
+          setAlertData(changes.lastSentAlert.newValue);
         }
       }
     };
@@ -81,11 +81,11 @@ export const Popup = () => {
           </li>
         </ul>
       </header>
-      <div className="py-10">
-        <div style={{ marginBottom: '16px' }}>
-          <h2>Current Alert</h2>
+      <div className="flex mt-10 flex-col border-2 border-red-500">
+        <div className="">
+          <h2 className="text-xl font-medium mb-5">Current Alert</h2>
           {alertData ? (
-            <div>
+            <div className="space-y-4">
               <p>
                 <strong>Severity:</strong> {alertData.severity}
               </p>
@@ -97,12 +97,13 @@ export const Popup = () => {
               </p>
             </div>
           ) : (
-            <p>No active alerts</p>
+            <p className="text-base">No active alerts</p>
           )}
         </div>
         <div>
-          <p>
-            Alerts are currently <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
+          <p className="text-sm">
+            Alerts are currently:{' '}
+            <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
           </p>
           <Button
             onClick={toggleAlerts}
