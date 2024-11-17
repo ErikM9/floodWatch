@@ -64,7 +64,7 @@ export const Popup = () => {
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
       <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex w-[100px] flex-row items-center justify-center">
+        <div className="flex w-[150px] flex-row items-center justify-center">
           <img
             src={logoImage}
             className="w-full h-full object-contain"
@@ -75,13 +75,13 @@ export const Popup = () => {
           <li className="pt-2">
             <Settings2
               size={20}
-              className="cursor-pointer"
+              className="cursor-pointer text-primaryFlood-dark"
               onClick={openOptionsPage}
             />
           </li>
         </ul>
       </header>
-      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif' }}>
+      <div className="py-10">
         <div style={{ marginBottom: '16px' }}>
           <h2>Current Alert</h2>
           {alertData ? (

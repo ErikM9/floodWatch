@@ -2,6 +2,13 @@ body {
   min-height: 100%;
   width: 100vw;
   background: linear-gradient(to bottom, #807fba, #34005d);
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Kaisei Decol', serif;
 }
 
 .navbar {
