@@ -61,6 +61,20 @@ export const Popup = () => {
     }
   });
 
+  const severityTextMap: { [key: number]: string } = {
+    1: '1 - severe flooding, danger to life!',
+    2: '2 - flooding is expected, immediate action required!',
+    3: '3 - flooding is possible, be prepared!',
+    4: '4 - Warning no longer in force!'
+  };
+
+  const severityClasses: { [key: number]: string } = {
+    1: 'text-[#FF0000]',
+    2: 'text-[#FFA500]',
+    3: 'text-[#218ced]',
+    4: 'text-[#008000]'
+  };
+
   return (
     <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
       <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
@@ -81,11 +95,11 @@ export const Popup = () => {
           </li>
         </ul>
       </header>
-      <div className="flex mt-10 flex-col border-2 border-red-500">
+      <div className="shadow-lg px-2 flex mt-10 flex-col border-1">
         <div className="">
           <h2 className="text-xl font-medium mb-5">Current Alert</h2>
           {alertData ? (
-            <div className="space-y-4">
+            <div className="space-y-3 text-sm">
               <p>
                 <strong>Severity:</strong> {alertData.severity}
               </p>
@@ -93,19 +107,31 @@ export const Popup = () => {
                 <strong>Description:</strong> {alertData.description}
               </p>
               <p>
-                <strong>Severity Level:</strong> {alertData.severityLevel}
+                <strong>Severity Level:</strong>{' '}
+                <span
+                  className={severityClasses[Number(alertData.severityLevel)]}>
+                  {severityTextMap[Number(alertData.severityLevel)] ||
+                    'Unknown'}
+                </span>
               </p>
+              <div>
+                <span>For more information check the option panel</span>
+                <span>
+                  <Button>Option</Button>
+                </span>
+              </div>
             </div>
           ) : (
             <p className="text-base">No active alerts</p>
           )}
         </div>
-        <div>
+        <div className="mt-9 pb-5 flex flex-col items-center justify-center">
           <p className="text-sm">
             Alerts are currently:{' '}
             <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
           </p>
           <Button
+            className="mt-5"
             onClick={toggleAlerts}
             style={{
               backgroundColor: alertsEnabled ? 'red' : 'green'
