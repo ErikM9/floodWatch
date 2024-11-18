@@ -1,24 +1,17 @@
 import '../global.css';
-import { Settings2 } from 'lucide-react';
 import logoImage from './../public/logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface popupMessage {
   severityLevel: string;
-  description: string;
   severity: string;
+  description: string;
 }
 
 export const Popup = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [alertData, setAlertData] = useState<popupMessage | null>(null);
-
-  const openOptionsPage = () => {
-    if (chrome && chrome.runtime && chrome.runtime.openOptionsPage) {
-      chrome.runtime.openOptionsPage();
-    }
-  };
 
   useEffect(() => {
     chrome.storage.local.get(['alertsEnabled', 'lastSentAlert'], (result) => {
@@ -76,7 +69,7 @@ export const Popup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[561px]">
+    <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[500px]">
       <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
         <div className="flex w-[150px] flex-row items-center justify-center">
           <img
@@ -85,15 +78,6 @@ export const Popup = () => {
             alt="FloodWatch icon"
           />
         </div>
-        <ul className="flex items-center">
-          <li className="pt-2">
-            <Settings2
-              size={20}
-              className="cursor-pointer text-primaryFlood-dark"
-              onClick={openOptionsPage}
-            />
-          </li>
-        </ul>
       </header>
       <div className="shadow-lg px-2 flex mt-10 flex-col border-1">
         <div className="">
@@ -104,9 +88,6 @@ export const Popup = () => {
                 <strong>Severity:</strong> {alertData.severity}
               </p>
               <p>
-                <strong>Description:</strong> {alertData.description}
-              </p>
-              <p>
                 <strong>Severity Level:</strong>{' '}
                 <span
                   className={severityClasses[Number(alertData.severityLevel)]}>
@@ -114,11 +95,13 @@ export const Popup = () => {
                     'Unknown'}
                 </span>
               </p>
+              <p>
+                <strong>Description:</strong> {alertData.description}
+              </p>
               <div>
-                <span>For more information check the option panel</span>
-                <span>
-                  <Button>Option</Button>
-                </span>
+                <p className="bg-yellow-100">
+                  For a full flood report, click the setting button below.
+                </p>
               </div>
             </div>
           ) : (
@@ -139,6 +122,13 @@ export const Popup = () => {
             {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
           </Button>
         </div>
+      </div>
+      <div className="mt-5">
+        <Button asChild className="bg-primaryFlood-dark">
+          <a href="/options.html" target="_blank" rel="noopener noreferrer">
+            Settings
+          </a>
+        </Button>
       </div>
     </div>
   );

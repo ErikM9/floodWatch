@@ -23,7 +23,7 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["geolocation", "storage", "notifications", "alarms"],
+  "permissions": ["storage", "notifications", "alarms"],
   "background": {
     "service_worker": "background2.js",
     "type": "module"
