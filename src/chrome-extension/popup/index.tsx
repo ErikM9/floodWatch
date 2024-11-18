@@ -79,9 +79,11 @@ export const Popup = () => {
           />
         </div>
       </header>
-      <div className="shadow-lg px-2 flex mt-10 flex-col border-1">
-        <div className="">
-          <h2 className="text-xl font-medium mb-5">Current Alert</h2>
+      <div className="shadow-lg w-full h-full px-2 flex mt-5 flex-col border-1">
+        <div>
+          <h2 className="text-xl text-center font-medium mb-5">
+            Current Alert
+          </h2>
           {alertData ? (
             <div className="space-y-3 text-sm">
               <p>
@@ -105,7 +107,7 @@ export const Popup = () => {
               </div>
             </div>
           ) : (
-            <p className="text-base">No active alerts</p>
+            <p className="text-base text-center">No active alerts</p>
           )}
         </div>
         <div className="mt-9 pb-5 flex flex-col items-center justify-center">
@@ -123,7 +125,7 @@ export const Popup = () => {
           </Button>
         </div>
       </div>
-      <div className="mt-5">
+      <div className="mt-5 mb-5">
         <Button asChild className="bg-primaryFlood-dark">
           <a href="/options.html" target="_blank" rel="noopener noreferrer">
             Settings
