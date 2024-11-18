@@ -84,13 +84,19 @@ async function storeFloodWarnings(): Promise<void> {
 }
 
 //TODO switch back to 15min
-chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
+// chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
+chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'checkFloods') {
     await storeFloodWarnings();
   }
 });
+// chrome.alarms.onAlarm.addListener(async (alarm) => {
+//   if (alarm.name === 'checkFloods') {
+//     await storeFloodWarnings();
+//   }
+// });
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes.userLocation) {
@@ -201,9 +207,8 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     const isEnabled = changes.alertsEnabled.newValue;
     console.log(`Alerts enabled: ${isEnabled}`);
 
-    //TODO review if this is necessary
     if (isEnabled) {
-      chrome.alarms.create('checkFloods', { periodInMinutes: 15 });
+      chrome.alarms.create('checkFloods', { periodInMinutes: 60 });
       console.log('Flood check alarm created');
     } else {
       chrome.alarms.clear('checkFloods');
@@ -240,7 +245,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   chrome.storage.local.set({ isFirstRun: false });
 });
 
-chrome.runtime.onStartup.addListener(() => {
-  console.log('chrome has started, checking if user is flooded...');
-  checkIfUserIsFlooded();
-});
+//TODO remove below if everything runs well
+// chrome.runtime.onStartup.addListener(() => {
+//   console.log('chrome has started, checking if user is flooded...');
+//   checkIfUserIsFlooded();
+// });
