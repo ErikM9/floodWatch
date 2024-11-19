@@ -133,7 +133,7 @@ async function checkIfUserIsFlooded() {
           {
             type: 'basic',
             iconUrl: chrome.runtime.getURL('public/32.png'),
-            title: 'Your area is at risk!',
+            title: 'Your area at risk!',
             message: `Warning: ${result.floodedPolygonData?.severity || ''}.`,
             priority: 2,
             requireInteraction: true
