@@ -69,68 +69,73 @@ export const Popup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 bg-gray-50 w-[350px] h-[500px]">
-      <header className="flex flex-row justify-between px-2 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex w-[150px] flex-row items-center justify-center">
+    <div className="flex flex-col items-center bg-gray-50 w-[350px] h-[500px]">
+      <header className="flex flex-row items-center px-2 py-2 bg-white drop-shadow-xl w-full">
+        <div className="flex w-[150px] h-[30px] flex-row items-center justify-center mx-auto">
           <img
             src={logoImage}
-            className="w-full h-full object-contain"
+            className="max-w-full max-h-full object-contain"
             alt="FloodWatch icon"
           />
         </div>
       </header>
-      <div className="shadow-lg w-full h-full px-2 flex mt-5 flex-col border-1">
-        <div>
-          <h2 className="text-xl text-center font-medium mb-5">
-            Current Alert
-          </h2>
-          {alertData ? (
-            <div className="space-y-3 text-sm">
-              <p>
-                <strong>Severity:</strong> {alertData.severity}
-              </p>
-              <p>
-                <strong>Severity Level:</strong>{' '}
-                <span
-                  className={severityClasses[Number(alertData.severityLevel)]}>
-                  {severityTextMap[Number(alertData.severityLevel)] ||
-                    'Unknown'}
-                </span>
-              </p>
-              <p>
-                <strong>Description:</strong> {alertData.description}
-              </p>
-              <div>
-                <p className="bg-yellow-100">
-                  For a full flood report, click the setting button below.
+      <div className="px-4 flex flex-col justify-center items-center">
+        <div className="shadow-lg w-full h-full px-2 flex mt-4 flex-col justify-evenly border-1">
+          <div>
+            <h2 className="text-xl pt-3 text-center font-medium mb-4">
+              Current Alert
+            </h2>
+            {alertData ? (
+              <div className="space-y-3 text-sm">
+                <p>
+                  <strong>Severity:</strong> {alertData.severity}
                 </p>
+                <p>
+                  <strong>Severity Level:</strong>{' '}
+                  <span
+                    className={
+                      severityClasses[Number(alertData.severityLevel)]
+                    }>
+                    {severityTextMap[Number(alertData.severityLevel)] ||
+                      'Unknown'}
+                  </span>
+                </p>
+                <p>
+                  <strong>Description:</strong> {alertData.description}
+                </p>
+                <div>
+                  <p className="bg-yellow-100 p-4 border rounded-xl">
+                    For a full flood report, click the{' '}
+                    <span className="font-bold">settings</span> button.
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <p className="text-base text-center">No active alerts</p>
-          )}
+            ) : (
+              <p className="text-base text-center">No active alerts</p>
+            )}
+          </div>
+          <div className="mt-5 pb-5 flex flex-col items-center justify-center">
+            <p className="text-sm">
+              Alerts are currently:{' '}
+              <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
+            </p>
+            <Button
+              className="mt-5"
+              onClick={toggleAlerts}
+              style={{
+                backgroundColor: alertsEnabled ? 'red' : 'green'
+              }}>
+              {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
+            </Button>
+          </div>
         </div>
-        <div className="mt-9 pb-5 flex flex-col items-center justify-center">
-          <p className="text-sm">
-            Alerts are currently:{' '}
-            <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
-          </p>
-          <Button
-            className="mt-5"
-            onClick={toggleAlerts}
-            style={{
-              backgroundColor: alertsEnabled ? 'red' : 'green'
-            }}>
-            {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
+        <div className="mt-5 mb-5">
+          <Button asChild className="bg-primaryFlood-dark">
+            <a href="/options.html" target="_blank" rel="noopener noreferrer">
+              Settings
+            </a>
           </Button>
         </div>
-      </div>
-      <div className="mt-5 mb-5">
-        <Button asChild className="bg-primaryFlood-dark">
-          <a href="/options.html" target="_blank" rel="noopener noreferrer">
-            Settings
-          </a>
-        </Button>
       </div>
     </div>
   );
