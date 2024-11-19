@@ -87,49 +87,69 @@ const Options = () => {
 
   return (
     <div>
-      <header className="flex flex-row justify-between px-10 pt-2 mb-14 bg-white drop-shadow-xl">
-        <div className="flex flex-row">
-          <div>
-            <img src={logoImage} className="size-20" alt="FloodWatch icon" />
+      <header className="flex justify-between items-center px-4 py-2 bg-white drop-shadow-xl w-full">
+        <div className="flex items-center w-full max-w-[1400px] mx-auto">
+          <div className="flex items-center justify-center">
+            <img
+              src={logoImage}
+              className="w-[200px] h-[100px] object-contain"
+              alt="FloodWatch icon"
+            />
           </div>
-          <div className="flex justify-center items-center">
-            <h4 className="text-xl font-bold text-blue-700 px-3">FloodWatch</h4>
-          </div>
+
+          <ul className="flex items-center space-x-4 ml-auto">
+            <li>
+              <Mail size={35} className="cursor-pointer" />
+            </li>
+          </ul>
         </div>
-        <ul className="flex justify-center items-center">
-          <li className="pt-2">
-            <Mail size={35} className="cursor-pointer" />
-          </li>
-        </ul>
       </header>
-      <section className="mx-16">
-        <div>
-          <UkMap2 userLocation={userLocation} />
+
+      <div className="mt-16 flex flex-row justify-center items-start mx-auto max-w-[1400px] gap-8">
+        <div className="flex flex-col justify-start items-start gap-8 w-full">
+          <div className="w-full">
+            <UkMap2 userLocation={userLocation} />
+          </div>
+
+          <div className="w-full">
+            <div className="w-full">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8">
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Area to Track</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your address" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Enter your address to locate yourself on the map.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit">Submit</Button>
+                </form>
+              </Form>
+            </div>
+          </div>
         </div>
-        <div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your address" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Enter your address to locate yourself on the map.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Submit</Button>
-            </form>
-          </Form>
+
+        {/* Right Section: Flood Report */}
+        <div className="w-full">
+          <h2 className="text-xl font-bold mb-4">Flood Report</h2>
+          <p className="text-gray-600">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate
+            maxime aliquid quas maiores dignissimos excepturi asperiores ea
+            voluptas dolorem facere?
+          </p>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
