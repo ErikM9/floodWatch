@@ -69,9 +69,10 @@ export const Popup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-50 w-[350px] h-[500px]">
+    <div className="flex flex-col items-center bg-gray-50 w-[350px] h-[561px]">
+      {/* Header */}
       <header className="flex flex-row items-center px-2 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex w-[150px] h-[30px] flex-row items-center justify-center mx-auto">
+        <div className="flex w-[150px] h-[30px] items-center justify-center mx-auto">
           <img
             src={logoImage}
             className="max-w-full max-h-full object-contain"
@@ -79,8 +80,11 @@ export const Popup = () => {
           />
         </div>
       </header>
-      <div className="px-4 flex flex-col justify-center items-center">
-        <div className="shadow-lg w-full h-full px-2 flex mt-4 flex-col justify-evenly border-1">
+
+      {/* Content Section */}
+      <div className="px-4 flex flex-col justify-around items-center h-full">
+        {/* Alert Card */}
+        <div className="shadow-lg bg-white w-full h-auto px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
           <div>
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
               Current Alert
@@ -100,7 +104,7 @@ export const Popup = () => {
                       'Unknown'}
                   </span>
                 </p>
-                <p>
+                <p className="text-pretty">
                   <strong>Description:</strong> {alertData.description}
                 </p>
                 <div>
@@ -114,23 +118,23 @@ export const Popup = () => {
               <p className="text-base text-center">No active alerts</p>
             )}
           </div>
+          {/* Alerts Toggle */}
           <div className="mt-5 pb-5 flex flex-col items-center justify-center">
             <p className="text-sm">
               Alerts are currently:{' '}
               <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
             </p>
             <Button
-              className="mt-5"
-              onClick={toggleAlerts}
-              style={{
-                backgroundColor: alertsEnabled ? 'red' : 'green'
-              }}>
+              className={`mt-5 ${alertsEnabled ? 'bg-red-500' : 'bg-green-500'} text-white`}
+              onClick={toggleAlerts}>
               {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
             </Button>
           </div>
         </div>
+
+        {/* Settings Button */}
         <div className="mt-5 mb-5">
-          <Button asChild className="bg-primaryFlood-dark">
+          <Button asChild className="bg-primaryFlood-dark text-white">
             <a href="/options.html" target="_blank" rel="noopener noreferrer">
               Settings
             </a>
