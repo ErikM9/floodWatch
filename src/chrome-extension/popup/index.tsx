@@ -45,6 +45,7 @@ export const Popup = () => {
     });
   };
 
+  //TODO this is not used anymore. Recheck if need or not
   chrome.runtime.onMessage.addListener((message) => {
     console.log('Message received in popup:', message);
 
@@ -70,7 +71,6 @@ export const Popup = () => {
 
   return (
     <div className="flex flex-col items-center bg-gray-50 w-[350px] h-[561px]">
-      {/* Header */}
       <header className="flex flex-row items-center px-2 py-2 bg-white drop-shadow-xl w-full">
         <div className="flex w-[150px] h-[30px] items-center justify-center mx-auto">
           <img
@@ -81,9 +81,7 @@ export const Popup = () => {
         </div>
       </header>
 
-      {/* Content Section */}
       <div className="px-4 flex flex-col justify-around items-center h-full">
-        {/* Alert Card */}
         <div className="shadow-lg bg-white w-full h-auto px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
           <div>
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
@@ -118,7 +116,7 @@ export const Popup = () => {
               <p className="text-base text-center">No active alerts</p>
             )}
           </div>
-          {/* Alerts Toggle */}
+
           <div className="mt-5 pb-5 flex flex-col items-center justify-center">
             <p className="text-sm">
               Alerts are currently:{' '}
@@ -132,7 +130,6 @@ export const Popup = () => {
           </div>
         </div>
 
-        {/* Settings Button */}
         <div className="mt-5 mb-5">
           <Button asChild className="bg-primaryFlood-dark text-white">
             <a href="/options.html" target="_blank" rel="noopener noreferrer">

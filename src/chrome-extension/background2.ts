@@ -97,7 +97,12 @@ async function checkIfUserIsFlooded() {
           severityLevel:
             result.floodedPolygonData?.severityLevel?.toString() || '',
           severity: result.floodedPolygonData?.severity || '',
-          description: result.floodedPolygonData?.description || ''
+          description: result.floodedPolygonData?.description || '',
+          message: result.floodedPolygonData?.message || '',
+          riverOrSea: result.floodedPolygonData?.riverOrSea || '',
+          county: result.floodedPolygonData?.county || '',
+          timeMessageChanged:
+            result.floodedPolygonData?.timeMessageChanged || ''
         };
 
         const { alertsEnabled, lastSentAlert } = await new Promise<StorageData>(
@@ -118,6 +123,8 @@ async function checkIfUserIsFlooded() {
           console.log('alerts are disabled, skipping notification.');
           return;
         }
+        console.log('lastSentAlert XXXX', lastSentAlert);
+        console.log('popupMessage XXXX', popupMessage);
 
         if (isEqual(lastSentAlert, popupMessage)) {
           console.log('same alert, no notification sent');

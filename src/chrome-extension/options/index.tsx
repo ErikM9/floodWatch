@@ -26,8 +26,19 @@ const formSchema = z.object({
   })
 });
 
+interface popupMessage {
+  severityLevel: string;
+  severity: string;
+  description: string;
+  message: string;
+  riverOrSea: string;
+  county: string;
+  timeMessageChanged: string;
+}
+
 const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
+  const [alertData, setAlertData] = useState<popupMessage | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,6 +75,13 @@ const Options = () => {
     };
 
     loadSavedLocation();
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.local.get(['lastSentAlert'], (result) => {
+      setAlertData(result.lastSentAlert ?? null);
+      console.log('lastSentAlert from option', result.lastSentAlert);
+    });
   }, []);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -144,9 +162,25 @@ const Options = () => {
         <div className="w-full">
           <h2 className="text-xl font-bold mb-4">Flood Report</h2>
           <p className="text-gray-600">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate
-            maxime aliquid quas maiores dignissimos excepturi asperiores ea
-            voluptas dolorem facere?
+            {' '}
+            <strong>County:</strong> {alertData?.county}
+          </p>
+          <p className="text-gray-600">
+            {' '}
+            <strong>Severity:</strong> {alertData?.severity}
+          </p>
+          <p className="text-gray-600">
+            {' '}
+            <strong>River or sea:</strong> {alertData?.riverOrSea}
+          </p>
+          <p className="text-gray-600">
+            {' '}
+            <strong>Message:</strong> {alertData?.message}
+          </p>
+          <p className="text-gray-600">
+            {' '}
+            <strong>Time message change:</strong>{' '}
+            {alertData?.timeMessageChanged}
           </p>
         </div>
       </div>
@@ -155,3 +189,5 @@ const Options = () => {
 };
 
 export default Options;
+
+//TODO fixe time message change and style
