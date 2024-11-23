@@ -1,9 +1,20 @@
 import { fetchFloodWarnings } from './api/testApi';
 import { getAndLogFloodData, isUserFlooded } from './services/FloodDataService';
 
+interface LastSentAlert {
+  id: string;
+  severityLevel?: string;
+  severity?: string;
+  description?: string;
+  message?: string;
+  riverOrSea?: string;
+  county?: string;
+  timeMessageChanged?: string;
+}
+
 interface StorageData {
   alertsEnabled?: boolean;
-  lastSentAlert?: any;
+  lastSentAlert?: LastSentAlert;
 }
 
 function openDatabase(): Promise<IDBDatabase> {
