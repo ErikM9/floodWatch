@@ -1,6 +1,5 @@
 import { fetchFloodWarnings } from './api/testApi';
 import { getAndLogFloodData, isUserFlooded } from './services/FloodDataService';
-import isEqual from 'lodash/isEqual';
 
 interface StorageData {
   alertsEnabled?: boolean;
@@ -94,6 +93,7 @@ async function checkIfUserIsFlooded() {
         console.log('Flood alert:', result.floodedPolygonData);
 
         const popupMessage = {
+          id: result.floodedPolygonData?.id || '',
           severityLevel:
             result.floodedPolygonData?.severityLevel?.toString() || '',
           severity: result.floodedPolygonData?.severity || '',
@@ -120,19 +120,24 @@ async function checkIfUserIsFlooded() {
         );
 
         if (!alertsEnabled) {
-          console.log('alerts are disabled, skipping notification.');
+          console.log('Alerts are disabled, skipping notification.');
           return;
         }
-        console.log('lastSentAlert XXXX', lastSentAlert);
-        console.log('popupMessage XXXX', popupMessage);
 
-        if (isEqual(lastSentAlert, popupMessage)) {
-          console.log('same alert, no notification sent');
+        console.log('Last Sent Alert:', lastSentAlert);
+        console.log('Current Popup Message:', popupMessage);
+
+        if (
+          lastSentAlert &&
+          lastSentAlert.id &&
+          lastSentAlert.id === popupMessage.id
+        ) {
+          console.log('The alert is still the same. No new notification sent.');
           return;
         }
 
         chrome.storage.local.set({ lastSentAlert: popupMessage }, () => {
-          console.log('updated lastSentAlert in storage:', popupMessage);
+          console.log('Updated lastSentAlert in storage:', popupMessage);
         });
 
         chrome.notifications.create(
@@ -152,13 +157,15 @@ async function checkIfUserIsFlooded() {
                 chrome.runtime.lastError.message
               );
             } else {
-              console.log('notification created with ID:', notificationId);
+              console.log('Notification created with ID:', notificationId);
             }
           }
         );
       } else {
-        console.log('no flooding detected.');
-        chrome.storage.local.remove('lastSentAlert');
+        console.log('No flooding detected.');
+        chrome.storage.local.remove('lastSentAlert', () => {
+          console.log('Cleared lastSentAlert from storage.');
+        });
       }
     } catch (error) {
       console.error('Error while checking flood status:', error);
