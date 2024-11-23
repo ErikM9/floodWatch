@@ -19,6 +19,7 @@ import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
 import UkMap2 from '../app-components/Map2';
+import { optionMessage } from '@/types/alertMessage';
 
 const formSchema = z.object({
   address: z.string().min(5, {
@@ -26,19 +27,9 @@ const formSchema = z.object({
   })
 });
 
-interface popupMessage {
-  severityLevel: string;
-  severity: string;
-  description: string;
-  message: string;
-  riverOrSea: string;
-  county: string;
-  timeMessageChanged: string;
-}
-
 const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
-  const [alertData, setAlertData] = useState<popupMessage | null>(null);
+  const [alertData, setAlertData] = useState<optionMessage | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

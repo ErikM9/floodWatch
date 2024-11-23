@@ -2,12 +2,7 @@ import '../global.css';
 import logoImage from './../public/logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
-interface popupMessage {
-  severityLevel: string;
-  severity: string;
-  description: string;
-}
+import { popupMessage } from '@/types/alertMessage';
 
 export const Popup = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);

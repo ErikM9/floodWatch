@@ -1,7 +1,4 @@
-export type GeocodingLocation = {
-  latitude: number;
-  longitude: number;
-};
+import { GeocodingLocation } from '@/types/geocoding';
 
 export async function userAddress(
   address: string
