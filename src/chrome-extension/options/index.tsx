@@ -4,6 +4,7 @@ import logoImage from './../public/logo.svg';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -102,13 +103,18 @@ const Options = () => {
             <img
               src={logoImage}
               className="w-[200px] h-[100px] object-contain"
-              alt="FloodWatch icon"
+              alt="FloodWatch logo linking to contact us page"
             />
           </div>
 
           <ul className="flex items-center space-x-4 ml-auto">
             <li>
-              <Mail size={35} className="cursor-pointer" />
+              <a
+                href="https://www.floodwatch.center/contact-us"
+                target="_blank"
+                rel="noopener noreferrer">
+                <Mail size={35} className="cursor-pointer" />
+              </a>
             </li>
           </ul>
         </div>
@@ -151,28 +157,51 @@ const Options = () => {
 
         {/* Right Section: Flood Report */}
         <div className="w-full">
-          <h2 className="text-xl font-bold mb-4">Flood Report</h2>
-          <p className="text-gray-600">
-            {' '}
-            <strong>County:</strong> {alertData?.county}
-          </p>
-          <p className="text-gray-600">
-            {' '}
-            <strong>Severity:</strong> {alertData?.severity}
-          </p>
-          <p className="text-gray-600">
-            {' '}
-            <strong>River or sea:</strong> {alertData?.riverOrSea}
-          </p>
-          <p className="text-gray-600">
-            {' '}
-            <strong>Message:</strong> {alertData?.message}
-          </p>
-          <p className="text-gray-600">
-            {' '}
-            <strong>Time message change:</strong>{' '}
-            {alertData?.timeMessageChanged}
-          </p>
+          <h2 className="text-xl font-bold mb-4 text-center">Flood Report</h2>
+          {alertData ? (
+            <div className="space-y-3 text-sm">
+              <p className="text-gray-600">
+                {' '}
+                <strong>County:</strong> {alertData?.county}
+              </p>
+              <p className="text-gray-600">
+                {' '}
+                <strong>Severity:</strong> {alertData?.severity}
+              </p>
+              <p className="text-gray-600">
+                {' '}
+                <strong>River or sea:</strong> {alertData?.riverOrSea}
+              </p>
+              <p className="text-gray-600">
+                {' '}
+                <strong>Message:</strong> {alertData?.message}
+              </p>
+              <p className="text-gray-600">
+                {' '}
+                <strong>Last time the message was changed:</strong>{' '}
+                {alertData?.timeMessageChanged
+                  ? format(
+                      parseISO(alertData.timeMessageChanged),
+                      'do MMMM yyyy HH:mm'
+                    )
+                  : 'no information available'}
+              </p>
+              <p className="text-center text-red-500">
+                Flood report issued by the{' '}
+                <span className="text-primaryFlood-dark">
+                  <a
+                    className="text-red-500"
+                    href="https://www.gov.uk/government/organisations/environment-agency"
+                    target="_blank"
+                    rel="nofollow noopener noreferrer">
+                    Environment Agency.
+                  </a>
+                </span>{' '}
+              </p>
+            </div>
+          ) : (
+            <p className="text-base text-center">No active alerts</p>
+          )}
         </div>
       </div>
     </div>
@@ -180,5 +209,3 @@ const Options = () => {
 };
 
 export default Options;
-
-//TODO fixe time message change and style

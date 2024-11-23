@@ -84,7 +84,6 @@ const UkMap2: React.FC<MapProps> = ({ userLocation }) => {
 
   return (
     <div>
-      <h1>Flood Map</h1>
       {floodData ? (
         <>
           <MapContainer center={center} zoom={zoom} style={mapStyle}>
