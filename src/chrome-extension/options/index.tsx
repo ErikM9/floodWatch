@@ -108,7 +108,7 @@ const Options = () => {
           </div>
 
           <ul className="flex items-center space-x-4 ml-auto">
-            <li>
+            <li className="cursor-pointer">
               <a
                 href="https://www.floodwatch.center/contact-us"
                 target="_blank"
