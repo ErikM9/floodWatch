@@ -76,6 +76,23 @@ const Options = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const handleStorageChange = (
+      changes: { [key: string]: chrome.storage.StorageChange },
+      namespace: string
+    ) => {
+      if (namespace === 'local' && changes.lastSentAlert) {
+        setAlertData(changes.lastSentAlert.newValue ?? null);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log('Form data:', data);
     const location = await userAddress(data.address);

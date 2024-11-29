@@ -59,7 +59,7 @@ export async function fetchPolygonData(floodAreaID: string): Promise<any> {
   }
 }
 
-// Function to extract and handle both Polygon and MultiPolygon geometries
+// function to extract and handle both polygon and multiPolygon
 export function extractCoordinates(polygonData: PolygonResponse): any[] {
   const features = polygonData.features;
 
