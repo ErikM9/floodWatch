@@ -1,122 +1,75 @@
-// import React from "react";
-// import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
-import { Icon, LatLngTuple } from 'leaflet';
-import { MapUpdater } from './MapUpdater';
-
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import fetchFloodData from '../api/ukFloodAPI';
-import { processPolygons } from '../utils/polygonhandler';
-
-interface GeoJSONFeature {
-  type: string;
-  geometry: {
-    type: string;
-    coordinates: number[][][];
-  };
-  properties: {
-    AREA: string;
-    TA_NAME: string;
-    DESCRIP: string;
-    LA_NAME: string;
-    RIVER_SEA: string;
-  };
-}
-
-interface GeoJSONFeatureCollection {
-  type: 'FeatureCollection';
-  features: GeoJSONFeature[];
-}
+import { getAndLogFloodData, MapPolygon } from '../services/FloodDataService';
+import {
+  FeatureCollection,
+  Feature,
+  Geometry,
+  GeoJsonProperties
+} from 'geojson';
+import { Icon, LatLngTuple } from 'leaflet';
+import { MapUpdater } from './MapUpdater';
 
 interface MapProps {
   userLocation: LatLngTuple | null;
 }
 
-// const UkMap = () => {
+const mapStyle = {
+  height: '50vh',
+  width: '100%'
+};
+
 const UkMap: React.FC<MapProps> = ({ userLocation }) => {
   const ukCenter: LatLngTuple = [54.0, -2.0];
   const center = userLocation || ukCenter;
   const zoom = userLocation ? 13 : 5.4;
 
-  const [geoJsonData, setGeoJsonData] =
-    useState<GeoJSONFeatureCollection | null>(null);
+  const [floodData, setFloodData] = useState<FeatureCollection | null>(null);
 
   useEffect(() => {
-    const loadPolygons = async () => {
-      try {
-        const polygonData = await fetchFloodData();
-        // console.log("Raw flood data:", JSON.stringify(polygonData, null, 2));
-
-        const geoJson = processPolygons(polygonData);
-
-        // const geoJson: GeoJSONFeatureCollection = {
-
-        //   type: "FeatureCollection",
-        //   features: polygonData.map((polygon: any, polygonIndex: number) => {
-        //     console.log(`Processing polygon ${polygonIndex}:`, JSON.stringify(polygon, null, 2));
-
-        //     return {
-        //       type: "Feature",
-        //       geometry: {
-        //         type: "MultiPolygon",
-        //         coordinates: polygon.map((p: any, pIndex: number) => {
-        //           console.log(`Processing p ${pIndex} in polygon ${polygonIndex}:`, JSON.stringify(p, null, 2));
-
-        //           if (!p.coordinates) {
-        //             console.error(`Missing coordinates in p ${pIndex} of polygon ${polygonIndex}`);
-        //             return [];
-        //           }
-
-        //           const validCoords = p.coordinates.map((coordSet: any, coordSetIndex: number) => {
-        //             console.log(` ${coordSetIndex} in p ${pIndex} of polygon ${polygonIndex}:`, JSON.stringify(coordSet, null, 2));
-
-        //             const coords = Array.isArray(coordSet[0]) ? coordSet[0] : coordSet;
-
-        //             return coords.filter((point: any) => {
-        //               return Array.isArray(point) && point.length === 2 && !isNaN(point[0]) && !isNaN(point[1]);
-        //             });
-        //           });
-        //           console.log('Coordinates should be in [lon, lat]:', validCoords)
-        //           return validCoords;
-        //         }),
-        //       },
-        //       properties: {
-        //         AREA: polygon[0]?.AREA || "",
-        //         TA_NAME: polygon[0]?.TA_NAME || "",
-        //         DESCRIP: polygon[0]?.DESCRIP || "",
-        //         LA_NAME: polygon[0]?.LA_NAME || "",
-        //         RIVER_SEA: polygon[0]?.RIVER_SEA || "",
-        //       }
-        //     };
-        //   })
-        // };
-
-        // console.log("Processed GeoJSON data:", JSON.stringify(geoJson, null, 2));
-        setGeoJsonData(geoJson);
-      } catch (error) {
-        console.error('Error fetching or processing polygon data:', error);
-      }
-    };
-
-    loadPolygons();
+    getAndLogFloodData((data) => {
+      const processedData = MapPolygon(data);
+      setFloodData(processedData);
+    });
   }, []);
 
-  //   return (
-  //     <MapContainer center={[51.6, -1.1]} zoom={10} style={{ height: "400px", width: "100%" }} >
-  //       <TileLayer
-  //         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  //         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  //       />
-  //       {
-  //         geoJsonData && (
-  //           <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
-  //         )
-  //       }
-  //     </MapContainer >
-  //   );
-  // }
+  const styleFeature = (
+    feature: Feature<Geometry, GeoJsonProperties> | undefined
+  ) => {
+    let fillColor = '#000000';
+
+    if (feature && feature.properties) {
+      const severityLevel = feature.properties.severityLevel;
+
+      switch (severityLevel) {
+        case 1:
+          fillColor = '#FF0000'; // red - Severe Flooding, Danger to Life.
+          break;
+        case 2:
+          fillColor = '#FFA500'; // orange - Flooding is Expected, Immediate Action Required.
+          break;
+        case 3:
+          fillColor = '#218ced'; // blue - Flooding is Possible, Be Prepared.
+          break;
+        case 4:
+          fillColor = '#008000'; // green - Warning no Longer in Force
+          break;
+        default:
+          console.warn('Unknown severity level:', severityLevel);
+          fillColor = '#000000';
+      }
+    } else {
+      console.warn('severityLevel missing');
+    }
+
+    return {
+      color: fillColor,
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.5
+    };
+  };
 
   const customIcon = new Icon({
     iconUrl:
@@ -130,29 +83,29 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
   });
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      style={{ height: '50vh', width: '100%' }}>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div>
+      {floodData ? (
+        <>
+          <MapContainer center={center} zoom={zoom} style={mapStyle}>
+            <TileLayer
+              attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <GeoJSON data={floodData} style={styleFeature} />
+            <MapUpdater center={center} zoom={zoom} />
 
-      {geoJsonData && (
-        <GeoJSON data={geoJsonData} style={{ color: 'blue', weight: 2 }} />
+            {userLocation && (
+              <Marker position={userLocation} icon={customIcon}>
+                <Popup>Your location</Popup>
+              </Marker>
+            )}
+          </MapContainer>
+        </>
+      ) : (
+        <p>Loading flood data...</p>
       )}
-
-      <MapUpdater center={center} zoom={zoom} />
-      {userLocation && (
-        <Marker position={userLocation} icon={customIcon}>
-          <Popup>Your location</Popup>
-        </Marker>
-      )}
-    </MapContainer>
+    </div>
   );
 };
-
-// export default Map;
 
 export default UkMap;

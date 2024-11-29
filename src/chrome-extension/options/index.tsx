@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { userAddress } from '../api/geocoding';
 import { LatLngTuple } from 'leaflet';
 import { useEffect, useState } from 'react';
-import UkMap2 from '../app-components/Map2';
+import UkMap from '../app-components/Map';
 import { optionMessage } from '@/types/alertMessage';
 
 const formSchema = z.object({
@@ -140,7 +140,7 @@ const Options = () => {
       <div className="mt-16 flex flex-row justify-center items-start mx-auto max-w-[1400px] gap-8">
         <div className="flex flex-col justify-start items-start gap-8 w-full">
           <div className="w-full">
-            <UkMap2 userLocation={userLocation} />
+            <UkMap userLocation={userLocation} />
           </div>
 
           <div className="w-full">
