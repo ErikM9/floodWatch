@@ -1,6 +1,6 @@
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
-import { getFloodWarningsFromDB } from '../background2';
+import { getFloodWarningsFromDB } from '../background';
 import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
 
 interface PolygonData {
