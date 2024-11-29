@@ -1,4 +1,4 @@
-import { fetchFloodWarnings } from './api/testApi';
+import { fetchFloodWarnings } from './api/ukFlood';
 import { getAndLogFloodData, isUserFlooded } from './services/FloodDataService';
 import { StorageData } from '@/types/types';
 
