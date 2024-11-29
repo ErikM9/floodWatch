@@ -84,6 +84,10 @@ export function extractCoordinates(polygonData: PolygonResponse): any[] {
 // import { floodResponse, polygonResponse } from '../../data/floodMockData';
 // import { PolygonResponse, PolygonFeature } from '../../data/types';
 
+// if (import.meta.env.VITE_USE_MOCK_DATA === 'true') {
+//   console.log('Using mock data');
+// }
+
 // interface FloodDetails {
 //   id: string;
 //   description: string;

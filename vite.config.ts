@@ -2,10 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { resolve } from 'path';
+import babel from '@rollup/plugin-babel';
 import path from 'path';
 
-// https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     viteStaticCopy({
@@ -17,7 +17,14 @@ export default defineConfig({
         { src: 'src/chrome-extension/public/128.png', dest: './public' },
         { src: 'src/chrome-extension/public/192.png', dest: './public' }
       ]
-    })
+    }),
+    // Add Babel plugin only in production
+    mode === 'production' &&
+      babel({
+        babelHelpers: 'bundled',
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        plugins: mode === 'production' ? ['transform-remove-console'] : []
+      })
   ],
   resolve: {
     alias: {
@@ -41,7 +48,8 @@ export default defineConfig({
       },
       output: {
         entryFileNames: '[name].js'
-      }
+      },
+      external: mode === 'production' ? ['@data/floodMockData'] : []
     }
   }
-});
+}));
