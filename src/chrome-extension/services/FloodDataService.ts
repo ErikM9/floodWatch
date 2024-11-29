@@ -50,16 +50,8 @@ let listenerAdded = false;
 export function getAndLogFloodData(
   callback: (floodData: FloodWarning[]) => void
 ): void {
-  console.log('getAndLogFloodData invoked');
-
   getFloodWarningsFromDB()
     .then((floodData) => {
-      console.log('floodData from service IndexedDB T', floodData);
-
-      // const geoJsonData = MapPolygon(floodData);
-
-      // console.log('GeoJSON Data:', geoJsonData); // Log processed GeoJSON data
-
       callback(floodData);
     })
     .catch((error) => {
@@ -99,8 +91,7 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
   return new Promise((resolve) => {
     getAndLogFloodData((floodData) => {
       allFloodData.length = 0;
-      // TODO make sure that floodData is an array
-      console.log('floodData in service of XXXX', floodData);
+
       floodData.forEach((flood) => {
         const {
           id,
