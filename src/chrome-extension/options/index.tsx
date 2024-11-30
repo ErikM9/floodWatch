@@ -146,12 +146,19 @@ const Options = () => {
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Area to Track</FormLabel>
+                        <FormLabel className="text-primaryFlood-dark text-lg font-medium">
+                          Location to monitor: service available only in England
+                          🏴󠁧󠁢󠁥󠁮󠁧󠁿
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your address" {...field} />
+                          <Input
+                            placeholder="Enter a valid address within England"
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription>
-                          Enter your address to locate yourself on the map.
+                          Type in your address to see your location on the map!
+                          We only support locations in England.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
