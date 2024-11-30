@@ -98,7 +98,7 @@ const Options = () => {
   };
 
   return (
-    <div>
+    <div className="bg-gray-50">
       <header className="flex justify-between items-center px-4 py-2 bg-white drop-shadow-xl w-full">
         <div className="flex items-center w-full max-w-[1400px] mx-auto">
           <div className="flex items-center justify-center">
@@ -123,7 +123,7 @@ const Options = () => {
         </div>
       </header>
 
-      <div className="mt-16 flex flex-row justify-center items-start mx-auto max-w-[1400px] gap-8">
+      <div className="mt-16 flex flex-col pb-10 lg:flex-row justify-center items-start mx-4 lg:mx-auto max-w-[1400px] gap-8 bg-gray-50">
         <div className="flex flex-col justify-start items-start gap-8 w-full">
           <div className="w-full">
             {loading ? (
@@ -135,7 +135,7 @@ const Options = () => {
             )}
           </div>
 
-          <div className="w-full">
+          <div className="w-full flex flex-col items-center">
             <div className="w-full">
               <Form {...form}>
                 <form
@@ -157,7 +157,11 @@ const Options = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Submit</Button>
+                  <div className="flex justify-center lg:justify-start lg:items-start">
+                    <Button type="submit" className="mx-auto lg:mx-0">
+                      Submit
+                    </Button>
+                  </div>
                 </form>
               </Form>
             </div>

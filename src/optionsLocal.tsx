@@ -5,7 +5,7 @@ import './chrome-extension/global.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <div className="bg-gray-50 w-full h-[1000px]">
+    <div className="bg-gray-50 w-full h-full">
       <Options />
     </div>
   </StrictMode>
