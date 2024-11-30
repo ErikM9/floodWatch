@@ -102,11 +102,17 @@ const Options = () => {
       <header className="flex justify-between items-center px-4 py-2 bg-white drop-shadow-xl w-full">
         <div className="flex items-center w-full max-w-[1400px] mx-auto">
           <div className="flex items-center justify-center">
-            <img
-              src={logoImage}
-              className="w-[200px] h-[100px] object-contain"
-              alt="FloodWatch logo linking to contact us page"
-            />
+            <a
+              href="https://www.floodwatch.center"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="FloodWatch's website">
+              <img
+                src={logoImage}
+                className="w-[200px] h-[100px] object-contain cursor-pointer"
+                alt="FloodWatch logo"
+              />
+            </a>
           </div>
 
           <ul className="flex items-center space-x-4 ml-auto">
