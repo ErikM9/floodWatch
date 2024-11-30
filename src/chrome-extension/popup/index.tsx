@@ -7,20 +7,33 @@ import { popupMessage } from '@/types/alertMessage';
 export const Popup = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [alertData, setAlertData] = useState<popupMessage | null>(null);
+  const [isActiveFlood, setIsActiveFlood] = useState(false);
 
   useEffect(() => {
-    chrome.storage.local.get(['alertsEnabled', 'lastSentAlert'], (result) => {
-      setAlertsEnabled(result.alertsEnabled ?? false);
-      setAlertData(result.lastSentAlert ?? null);
-    });
+    // Fetch initial state
+    chrome.storage.local.get(
+      ['alertsEnabled', 'lastSentAlert', 'isActiveFlood'],
+      (result) => {
+        setAlertsEnabled(result.alertsEnabled ?? false);
+        setAlertData(result.lastSentAlert ?? null);
+        setIsActiveFlood(result.isActiveFlood ?? false);
+      }
+    );
 
-    const storageListener = (changes: any, areaName: string) => {
+    // Listen for storage changes
+    const storageListener = (
+      changes: { [key: string]: chrome.storage.StorageChange },
+      areaName: string
+    ) => {
       if (areaName === 'local') {
         if (changes.alertsEnabled) {
           setAlertsEnabled(changes.alertsEnabled.newValue);
         }
         if (changes.lastSentAlert) {
           setAlertData(changes.lastSentAlert.newValue);
+        }
+        if (changes.isActiveFlood) {
+          setIsActiveFlood(changes.isActiveFlood.newValue);
         }
       }
     };
@@ -39,16 +52,6 @@ export const Popup = () => {
       console.log(`Alerts are now ${newState ? 'ON' : 'OFF'}`);
     });
   };
-
-  //TODO this is not used anymore. Recheck if need or not
-  chrome.runtime.onMessage.addListener((message) => {
-    console.log('Message received in popup:', message);
-
-    if (message.type === 'update_popup') {
-      const popupMessage = message.data;
-      console.log('Popup message data:', popupMessage);
-    }
-  });
 
   const severityTextMap: { [key: number]: string } = {
     1: '1 - severe flooding, danger to life!',
@@ -82,7 +85,7 @@ export const Popup = () => {
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
               Current Alert
             </h2>
-            {alertData ? (
+            {isActiveFlood && alertData ? (
               <div className="space-y-3 text-sm">
                 <p>
                   <strong>Severity:</strong> {alertData.severity}
