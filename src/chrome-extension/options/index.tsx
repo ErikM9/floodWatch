@@ -106,7 +106,7 @@ const Options = () => {
               href="https://www.floodwatch.center"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="FloodWatch's website">
+              aria-label="Flood Watch's website">
               <img
                 src={logoImage}
                 className="w-[200px] h-[100px] object-contain cursor-pointer"
