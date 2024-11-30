@@ -10,7 +10,6 @@ export const Popup = () => {
   const [isActiveFlood, setIsActiveFlood] = useState(false);
 
   useEffect(() => {
-    // Fetch initial state
     chrome.storage.local.get(
       ['alertsEnabled', 'lastSentAlert', 'isActiveFlood'],
       (result) => {
@@ -20,7 +19,6 @@ export const Popup = () => {
       }
     );
 
-    // Listen for storage changes
     const storageListener = (
       changes: { [key: string]: chrome.storage.StorageChange },
       areaName: string

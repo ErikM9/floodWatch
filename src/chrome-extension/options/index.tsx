@@ -31,6 +31,7 @@ const formSchema = z.object({
 const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
   const [alertData, setAlertData] = useState<optionMessage | null>(null);
+  const [isActiveFlood, setIsActiveFlood] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,49 +41,29 @@ const Options = () => {
   });
 
   useEffect(() => {
-    const loadSavedLocation = async () => {
-      let savedLocation: LatLngTuple | null = null;
-
-      if (typeof chrome !== 'undefined' && chrome.storage) {
-        try {
-          const result = await chrome.storage.local.get(['userLocation']);
-          savedLocation = result.userLocation;
-        } catch (error) {
-          console.error(
-            'Error loading saved location from Chrome storage:',
-            error
-          );
-        }
-      } else {
-        const localStorageLocation = localStorage.getItem('userLocation');
-        if (localStorageLocation) {
-          savedLocation = JSON.parse(localStorageLocation);
-        }
+    chrome.storage.local.get(
+      ['userLocation', 'lastSentAlert', 'isActiveFlood'],
+      (result) => {
+        setUserLocation(result.userLocation ?? null);
+        setAlertData(result.lastSentAlert ?? null);
+        setIsActiveFlood(result.isActiveFlood ?? false);
       }
+    );
 
-      if (savedLocation) {
-        console.log('Loaded saved location:', savedLocation);
-        setUserLocation(savedLocation);
-      }
-    };
-
-    loadSavedLocation();
-  }, []);
-
-  useEffect(() => {
-    chrome.storage.local.get(['lastSentAlert'], (result) => {
-      setAlertData(result.lastSentAlert ?? null);
-      console.log('lastSentAlert from option', result.lastSentAlert);
-    });
-  }, []);
-
-  useEffect(() => {
     const handleStorageChange = (
       changes: { [key: string]: chrome.storage.StorageChange },
       namespace: string
     ) => {
-      if (namespace === 'local' && changes.lastSentAlert) {
-        setAlertData(changes.lastSentAlert.newValue ?? null);
+      if (namespace === 'local') {
+        if (changes.userLocation) {
+          setUserLocation(changes.userLocation.newValue ?? null);
+        }
+        if (changes.lastSentAlert) {
+          setAlertData(changes.lastSentAlert.newValue ?? null);
+        }
+        if (changes.isActiveFlood) {
+          setIsActiveFlood(changes.isActiveFlood.newValue ?? false);
+        }
       }
     };
 
@@ -105,7 +86,7 @@ const Options = () => {
       setUserLocation(newLocation);
 
       chrome.storage.local.set({ userLocation: newLocation }, () => {
-        console.log('location saved to chrome storage');
+        console.log('Location saved to Chrome storage');
       });
     } else {
       console.log('Geocoding failed or no results found');
@@ -175,28 +156,28 @@ const Options = () => {
         {/* Right Section: Flood Report */}
         <div className="w-full">
           <h2 className="text-xl font-bold mb-4 text-center">Flood Report</h2>
-          {alertData ? (
+          {isActiveFlood && alertData ? (
             <div className="space-y-3 text-sm">
               <p className="text-gray-600">
                 {' '}
-                <strong>County:</strong> {alertData?.county}
+                <strong>County:</strong> {alertData.county}
               </p>
               <p className="text-gray-600">
                 {' '}
-                <strong>Severity:</strong> {alertData?.severity}
+                <strong>Severity:</strong> {alertData.severity}
               </p>
               <p className="text-gray-600">
                 {' '}
-                <strong>River or sea:</strong> {alertData?.riverOrSea}
+                <strong>River or sea:</strong> {alertData.riverOrSea}
               </p>
               <p className="text-gray-600">
                 {' '}
-                <strong>Message:</strong> {alertData?.message}
+                <strong>Message:</strong> {alertData.message}
               </p>
               <p className="text-gray-600">
                 {' '}
                 <strong>Last time the message was changed:</strong>{' '}
-                {alertData?.timeMessageChanged
+                {alertData.timeMessageChanged
                   ? format(
                       parseISO(alertData.timeMessageChanged),
                       'do MMMM yyyy HH:mm'
