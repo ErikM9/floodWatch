@@ -56,3 +56,15 @@ export interface PolygonResponse {
   type: string;
   features: PolygonFeature[];
 }
+
+export interface FloodWarning {
+  id: string;
+  description: string;
+  county: string;
+  riverOrSea: string;
+  severity: string;
+  severityLevel: number;
+  message: string;
+  timeMessageChanged: string;
+  polygonData: Polygon[];
+}
