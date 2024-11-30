@@ -1,4 +1,4 @@
-export interface PolygonDataTwo {
+interface PolygonData {
   area: string;
   description: string;
   geometry: {
@@ -7,14 +7,14 @@ export interface PolygonDataTwo {
   };
 }
 
-export interface FloodWarning {
+export interface FloodWithPolygonData {
   id: string;
   description: string;
   county: string;
   severity: string;
   severityLevel: number;
   message: string;
-  polygonData: PolygonDataTwo[];
   riverOrSea: string;
   timeMessageChanged: string;
+  polygonData: PolygonData[];
 }

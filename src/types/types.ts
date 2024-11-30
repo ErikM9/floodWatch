@@ -14,21 +14,6 @@ export interface StorageData {
   lastSentAlert?: LastSentAlert;
 }
 
-// export interface FloodWarning {
-//   id: string;
-//   severity: string;
-//   severityLevel: number;
-//   description: string;
-//   message: string;
-//   riverOrSea: string;
-//   county: string;
-//   timeMessageChanged: string;
-//   polygonData: {
-//     type: string;
-//     coordinates: number[][][] | number[][][][];
-//   };
-// }
-
 interface PolygonData {
   area: string;
   description: string;
