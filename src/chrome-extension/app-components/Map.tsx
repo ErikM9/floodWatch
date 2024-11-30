@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { BarLoader } from 'react-spinners';
 import { getAndLogFloodData, MapPolygon } from '../services/FloodDataService';
 import {
   FeatureCollection,
@@ -102,7 +103,9 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
           </MapContainer>
         </>
       ) : (
-        <p>Loading flood data...</p>
+        <div className="flex justify-center items-center h-[50vh]">
+          <BarLoader />
+        </div>
       )}
     </div>
   );

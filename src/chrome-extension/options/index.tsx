@@ -1,5 +1,6 @@
 import '../global.css';
 import { Mail } from 'lucide-react';
+import { BarLoader } from 'react-spinners';
 import logoImage from './../public/logo.svg';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -32,6 +33,7 @@ const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
   const [alertData, setAlertData] = useState<optionMessage | null>(null);
   const [isActiveFlood, setIsActiveFlood] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,12 +43,14 @@ const Options = () => {
   });
 
   useEffect(() => {
+    setLoading(true);
     chrome.storage.local.get(
       ['userLocation', 'lastSentAlert', 'isActiveFlood'],
       (result) => {
         setUserLocation(result.userLocation ?? null);
         setAlertData(result.lastSentAlert ?? null);
         setIsActiveFlood(result.isActiveFlood ?? false);
+        setLoading(false);
       }
     );
 
@@ -110,7 +114,8 @@ const Options = () => {
               <a
                 href="https://www.floodwatch.center/contact-us"
                 target="_blank"
-                rel="noopener noreferrer">
+                rel="noopener noreferrer"
+                aria-label="Contact us link">
                 <Mail size={35} className="cursor-pointer" />
               </a>
             </li>
@@ -121,7 +126,13 @@ const Options = () => {
       <div className="mt-16 flex flex-row justify-center items-start mx-auto max-w-[1400px] gap-8">
         <div className="flex flex-col justify-start items-start gap-8 w-full">
           <div className="w-full">
-            <UkMap userLocation={userLocation} />
+            {loading ? (
+              <div className="flex items-center justify-center h-[50vh] shadow-lg border rounded-lg px-4 py-4">
+                <BarLoader />
+              </div>
+            ) : (
+              <UkMap userLocation={userLocation} />
+            )}
           </div>
 
           <div className="w-full">
@@ -156,26 +167,25 @@ const Options = () => {
         {/* Right Section: Flood Report */}
         <div className="w-full shadow-lg h-[50vh] border rounded-lg px-4 py-4">
           <h2 className="text-xl font-bold mb-4 text-center">Flood Report</h2>
-          {isActiveFlood && alertData ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <BarLoader />
+            </div>
+          ) : isActiveFlood && alertData ? (
             <div className="space-y-3 text-sm">
               <p className="text-gray-600">
-                {' '}
                 <strong>County:</strong> {alertData.county}
               </p>
               <p className="text-gray-600">
-                {' '}
                 <strong>Severity:</strong> {alertData.severity}
               </p>
               <p className="text-gray-600">
-                {' '}
                 <strong>River or sea:</strong> {alertData.riverOrSea}
               </p>
               <p className="text-gray-600">
-                {' '}
                 <strong>Message:</strong> {alertData.message}
               </p>
               <p className="text-gray-600">
-                {' '}
                 <strong>Last time the message was changed:</strong>{' '}
                 {alertData.timeMessageChanged
                   ? format(
