@@ -172,7 +172,7 @@ const Options = () => {
               <BarLoader />
             </div>
           ) : isActiveFlood && alertData ? (
-            <div className="space-y-3 text-sm">
+            <div className="space-y-3 text-sm overflow-y-auto h-[calc(50vh-5rem)] px-2">
               <p className="text-gray-600">
                 <strong>County:</strong> {alertData.county}
               </p>
@@ -194,17 +194,18 @@ const Options = () => {
                     )
                   : 'no information available'}
               </p>
-              <p className="text-center text-red-500">
+              <p className="text-center text-red-500 ">
                 Flood report issued by the{' '}
-                <span className="text-primaryFlood-dark">
+                <span className="underline ">
                   <a
-                    className="text-red-500"
+                    className="text-red-500 cursor-pointer"
                     href="https://www.gov.uk/government/organisations/environment-agency"
                     target="_blank"
                     rel="nofollow noopener noreferrer">
-                    Environment Agency.
+                    Environment Agency
                   </a>
-                </span>{' '}
+                </span>
+                .
               </p>
             </div>
           ) : (
