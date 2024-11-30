@@ -154,7 +154,7 @@ const Options = () => {
         </div>
 
         {/* Right Section: Flood Report */}
-        <div className="w-full">
+        <div className="w-full shadow-lg h-[50vh] border rounded-lg px-4 py-4">
           <h2 className="text-xl font-bold mb-4 text-center">Flood Report</h2>
           {isActiveFlood && alertData ? (
             <div className="space-y-3 text-sm">
