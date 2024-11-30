@@ -1,0 +1,20 @@
+export interface PolygonDataTwo {
+  area: string;
+  description: string;
+  geometry: {
+    type: 'Polygon' | 'MultiPolygon';
+    coordinates: number[][][] | number[][][][];
+  };
+}
+
+export interface FloodWarning {
+  id: string;
+  description: string;
+  county: string;
+  severity: string;
+  severityLevel: number;
+  message: string;
+  polygonData: PolygonDataTwo[];
+  riverOrSea: string;
+  timeMessageChanged: string;
+}

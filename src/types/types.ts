@@ -14,17 +14,38 @@ export interface StorageData {
   lastSentAlert?: LastSentAlert;
 }
 
-export interface FloodWarning {
-  id: string;
-  severity: string;
-  severityLevel: number;
+// export interface FloodWarning {
+//   id: string;
+//   severity: string;
+//   severityLevel: number;
+//   description: string;
+//   message: string;
+//   riverOrSea: string;
+//   county: string;
+//   timeMessageChanged: string;
+//   polygonData: {
+//     type: string;
+//     coordinates: number[][][] | number[][][][];
+//   };
+// }
+
+interface PolygonData {
+  area: string;
   description: string;
-  message: string;
-  riverOrSea: string;
-  county: string;
-  timeMessageChanged: string;
-  polygonData: {
-    type: string;
+  geometry: {
+    type: 'Polygon' | 'MultiPolygon';
     coordinates: number[][][] | number[][][][];
   };
+}
+
+export interface FloodWarning {
+  id: string;
+  description: string;
+  county: string;
+  severity: string;
+  severityLevel: number;
+  message: string;
+  riverOrSea: string;
+  timeMessageChanged: string;
+  polygonData: PolygonData[];
 }

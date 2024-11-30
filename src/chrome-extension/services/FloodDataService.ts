@@ -3,6 +3,49 @@ import { point } from '@turf/helpers';
 import { getFloodWarningsFromDB } from '../background';
 import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
 
+// interface PolygonData {
+//   area: string;
+//   description: string;
+//   geometry: {
+//     type: 'Polygon' | 'MultiPolygon';
+//     coordinates: number[][][] | number[][][][];
+//   };
+// }
+
+// interface PolygonDataTwo {
+//   area: string;
+//   description: string;
+//   geometry: {
+//     type: 'Polygon' | 'MultiPolygon';
+//     coordinates: number[][][] | number[][][][];
+//   };
+// }
+
+// interface FloodWarning {
+//   id: string;
+//   description: string;
+//   county: string;
+//   severity: string;
+//   severityLevel: number;
+//   message: string;
+//   polygonData: PolygonDataTwo[];
+//   riverOrSea: string;
+//   timeMessageChanged: string;
+// }
+
+// interface FloodWithPolygonData {
+//   id: string;
+//   description: string;
+//   county: string;
+//   severity: string;
+//   severityLevel: number;
+//   message: string;
+//   polygonData: PolygonData[];
+//   riverOrSea: string;
+//   timeMessageChanged: string;
+// }
+
+// Base polygon data interface
 interface PolygonData {
   area: string;
   description: string;
@@ -12,26 +55,48 @@ interface PolygonData {
   };
 }
 
-interface PolygonDataTwo {
-  area: string;
-  description: string;
-  geometry: {
-    type: 'Polygon' | 'MultiPolygon';
-    coordinates: number[][][] | number[][][][];
-  };
-}
+// Single interface for flood warnings
+// interface FloodWithPolygonData {
+//   id: string;
+//   description: string;
+//   county: string;
+//   severity: string;
+//   severityLevel: number;
+//   message: string;
+//   polygonData: PolygonData[]; // Changed to array of PolygonData
+//   riverOrSea: string;
+//   timeMessageChanged: string;
+// }
 
-interface FloodWarning {
-  id: string;
-  description: string;
-  county: string;
-  severity: string;
-  severityLevel: number;
-  message: string;
-  polygonData: PolygonDataTwo[];
-  riverOrSea: string;
-  timeMessageChanged: string;
-}
+// export interface FloodWithPolygonData {
+//   id: string;
+//   severity: string;
+//   severityLevel: number;
+//   description: string;
+//   message: string;
+//   riverOrSea: string;
+//   county: string;
+//   timeMessageChanged: string;
+//   polygonData: {
+//     type: string;
+//     coordinates: number[][][] | number[][][][];
+//   };
+// }
+
+// interface FloodWithPolygonData {
+//   id: string;
+//   description: string;
+//   county: string;
+//   severity: string;
+//   severityLevel: number;
+//   message: string;
+//   polygonData: {
+//     type: string;
+//     coordinates: number[][][] | number[][][][];
+//   };
+//   riverOrSea: string;
+//   timeMessageChanged: string;
+// }
 
 interface FloodWithPolygonData {
   id: string;
@@ -40,15 +105,15 @@ interface FloodWithPolygonData {
   severity: string;
   severityLevel: number;
   message: string;
-  polygonData: PolygonData[];
   riverOrSea: string;
   timeMessageChanged: string;
+  polygonData: PolygonData[];
 }
 
 let listenerAdded = false;
 
 export function getAndLogFloodData(
-  callback: (floodData: FloodWarning[]) => void
+  callback: (floodData: FloodWithPolygonData[]) => void
 ): void {
   getFloodWarningsFromDB()
     .then((floodData) => {
@@ -85,7 +150,7 @@ export function getAndLogFloodData(
 }
 
 export function logPolygonsFromFloodWarnings(): Promise<any[]> {
-  const allFloodData: FloodWarning[] = [];
+  const allFloodData: FloodWithPolygonData[] = [];
   console.log('allFloodData:', allFloodData);
 
   return new Promise((resolve) => {
@@ -195,7 +260,9 @@ getAndLogFloodData((floodData) => {
   MapPolygon(floodData);
 });
 
-export const MapPolygon = (floodData: FloodWarning[]): FeatureCollection => {
+export const MapPolygon = (
+  floodData: FloodWithPolygonData[]
+): FeatureCollection => {
   return {
     type: 'FeatureCollection',
     features: floodData
