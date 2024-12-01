@@ -7,7 +7,7 @@ export const floodResponse = {
       'https://environment.data.gov.uk/flood-monitoring/doc/reference',
     version: '1.0',
     comment: 'Mock data for flood alerts in England',
-    hasFormat: ['application/json', 'application/xml']
+    hasFormat: ['application/json', 'application/xml'],
   },
   items: [
     {
@@ -21,7 +21,7 @@ export const floodResponse = {
         notation: '034WAFSDER',
         polygon:
           'MULTIPOLYGON (((-1.5 51.8, -1.3 51.7, -1.2 51.8, -1.5 51.8)))',
-        riverOrSea: 'River Thames'
+        riverOrSea: 'River Thames',
       },
       floodAreaID: '034WAFSDER',
       isTidal: false,
@@ -30,7 +30,7 @@ export const floodResponse = {
       severity: 'Warning',
       severityLevel: 3,
       timeMessageChanged: '2024-11-14T08:30:00Z',
-      timeRaised: '2024-11-14T07:00:00Z'
+      timeRaised: '2024-11-14T07:00:00Z',
     },
     {
       '@id': 'floodItem-2',
@@ -43,7 +43,7 @@ export const floodResponse = {
         notation: '023WAERAGT',
         polygon:
           'MULTIPOLYGON (((-2.2 52.0, -2.1 51.9, -2.0 52.1, -2.2 52.0)))',
-        riverOrSea: 'River Severn'
+        riverOrSea: 'River Severn',
       },
       floodAreaID: '023WAERAGT',
       isTidal: true,
@@ -52,7 +52,7 @@ export const floodResponse = {
       severity: 'Severe Warning',
       severityLevel: 1,
       timeMessageChanged: '2024-11-14T09:00:00Z',
-      timeRaised: '2024-11-14T08:00:00Z'
+      timeRaised: '2024-11-14T08:00:00Z',
     },
     {
       '@id': 'floodItem-3',
@@ -65,7 +65,7 @@ export const floodResponse = {
         notation: '045WAFTREN',
         polygon:
           'MULTIPOLYGON (((-1.2 53.0, -1.0 52.9, -1.1 53.1, -1.2 53.0)))',
-        riverOrSea: 'River Trent'
+        riverOrSea: 'River Trent',
       },
       floodAreaID: '045WAFTREN',
       isTidal: false,
@@ -73,7 +73,7 @@ export const floodResponse = {
       severity: 'Warning',
       severityLevel: 2,
       timeMessageChanged: '2024-11-14T10:00:00Z',
-      timeRaised: '2024-11-14T09:30:00Z'
+      timeRaised: '2024-11-14T09:30:00Z',
     },
     {
       '@id': 'floodItem-4',
@@ -86,7 +86,7 @@ export const floodResponse = {
         notation: '056WAEDEN',
         polygon:
           'MULTIPOLYGON (((-2.8 54.7, -2.7 54.6, -2.6 54.7, -2.8 54.7)))',
-        riverOrSea: 'River Eden'
+        riverOrSea: 'River Eden',
       },
       floodAreaID: '056WAEDEN',
       isTidal: false,
@@ -95,9 +95,9 @@ export const floodResponse = {
       severity: 'Warning',
       severityLevel: 3,
       timeMessageChanged: '2024-11-14T11:00:00Z',
-      timeRaised: '2024-11-14T10:30:00Z'
-    }
-  ]
+      timeRaised: '2024-11-14T10:30:00Z',
+    },
+  ],
 };
 
 export const polygonResponse = {
@@ -113,10 +113,10 @@ export const polygonResponse = {
               [-1.5, 51.8],
               [-1.3, 51.7],
               [-1.2, 51.8],
-              [-1.5, 51.8]
-            ]
-          ]
-        ]
+              [-1.5, 51.8],
+            ],
+          ],
+        ],
       },
       properties: {
         AREA: 'River Thames Area',
@@ -124,8 +124,8 @@ export const polygonResponse = {
         DESCRIP: 'Flooding possible along River Thames',
         TA_NAME: 'Thames',
         LA_NAME: 'Oxfordshire',
-        RIVER_SEA: 'River Thames'
-      }
+        RIVER_SEA: 'River Thames',
+      },
     },
     {
       type: 'Feature',
@@ -137,10 +137,10 @@ export const polygonResponse = {
               [-2.2, 52.0],
               [-2.1, 51.9],
               [-2.0, 52.1],
-              [-2.2, 52.0]
-            ]
-          ]
-        ]
+              [-2.2, 52.0],
+            ],
+          ],
+        ],
       },
       properties: {
         AREA: 'River Severn Area',
@@ -148,8 +148,8 @@ export const polygonResponse = {
         DESCRIP: 'Flooding possible along River Severn',
         TA_NAME: 'Severn',
         LA_NAME: 'Gloucestershire',
-        RIVER_SEA: 'River Severn'
-      }
+        RIVER_SEA: 'River Severn',
+      },
     },
     {
       type: 'Feature',
@@ -161,10 +161,10 @@ export const polygonResponse = {
               [-1.2, 53.0],
               [-1.0, 52.9],
               [-1.1, 53.1],
-              [-1.2, 53.0]
-            ]
-          ]
-        ]
+              [-1.2, 53.0],
+            ],
+          ],
+        ],
       },
       properties: {
         AREA: 'River Trent Area',
@@ -172,8 +172,8 @@ export const polygonResponse = {
         DESCRIP: 'Flooding possible along River Trent',
         TA_NAME: 'Trent',
         LA_NAME: 'Nottinghamshire',
-        RIVER_SEA: 'River Trent'
-      }
+        RIVER_SEA: 'River Trent',
+      },
     },
     {
       type: 'Feature',
@@ -185,10 +185,10 @@ export const polygonResponse = {
               [-2.8, 54.7],
               [-2.7, 54.6],
               [-2.6, 54.7],
-              [-2.8, 54.7]
-            ]
-          ]
-        ]
+              [-2.8, 54.7],
+            ],
+          ],
+        ],
       },
       properties: {
         AREA: 'River Eden Area',
@@ -196,8 +196,8 @@ export const polygonResponse = {
         DESCRIP: 'Flooding possible along River Eden',
         TA_NAME: 'Eden',
         LA_NAME: 'Cumbria',
-        RIVER_SEA: 'River Eden'
-      }
-    }
-  ]
+        RIVER_SEA: 'River Eden',
+      },
+    },
+  ],
 };

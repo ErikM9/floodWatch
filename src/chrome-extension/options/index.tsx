@@ -20,15 +20,15 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { optionMessage } from '@/types/alertMessage';
 
 const formSchema = z.object({
   address: z.string().min(5, {
-    message: 'Address must be at least 5 characters.'
-  })
+    message: 'Address must be at least 5 characters.',
+  }),
 });
 
 const Options = () => {
@@ -40,8 +40,8 @@ const Options = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      address: ''
-    }
+      address: '',
+    },
   });
 
   useEffect(() => {
@@ -53,12 +53,12 @@ const Options = () => {
         setAlertData(result.lastSentAlert ?? null);
         setIsActiveFlood(result.isActiveFlood ?? false);
         setLoading(false);
-      }
+      },
     );
 
     const handleStorageChange = (
       changes: { [key: string]: chrome.storage.StorageChange },
-      namespace: string
+      namespace: string,
     ) => {
       if (namespace === 'local') {
         if (changes.userLocation) {
@@ -87,7 +87,7 @@ const Options = () => {
     if (location) {
       const newLocation: LatLngTuple = [location.latitude, location.longitude];
       console.log(
-        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`
+        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`,
       );
       setUserLocation(newLocation);
 
@@ -213,7 +213,7 @@ const Options = () => {
                 {alertData.timeMessageChanged
                   ? format(
                       parseISO(alertData.timeMessageChanged),
-                      'do MMMM yyyy HH:mm'
+                      'do MMMM yyyy HH:mm',
                     )
                   : 'no information available'}
               </p>

@@ -21,24 +21,24 @@ export default defineConfig(({ mode }) => ({
         { src: 'src/chrome-extension/public/32.png', dest: './public' },
         { src: 'src/chrome-extension/public/48.png', dest: './public' },
         { src: 'src/chrome-extension/public/128.png', dest: './public' },
-        { src: 'src/chrome-extension/public/192.png', dest: './public' }
-      ]
+        { src: 'src/chrome-extension/public/192.png', dest: './public' },
+      ],
     }),
 
     mode === 'production' &&
       babel({
         babelHelpers: 'bundled',
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        plugins: mode === 'production' ? ['transform-remove-console'] : []
-      })
+        plugins: mode === 'production' ? ['transform-remove-console'] : [],
+      }),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   server: {
-    open: '/popup-local.html'
+    open: '/popup-local.html',
   },
   build: {
     rollupOptions: {
@@ -49,13 +49,13 @@ export default defineConfig(({ mode }) => ({
         content: resolve(__dirname, 'src/chrome-extension/content.ts'),
         service: resolve(
           __dirname,
-          'src/chrome-extension/services/FloodDataService.ts'
-        )
+          'src/chrome-extension/services/FloodDataService.ts',
+        ),
       },
       output: {
-        entryFileNames: '[name].js'
+        entryFileNames: '[name].js',
       },
-      external: mode === 'production' ? ['@data/floodMockData'] : []
-    }
-  }
+      external: mode === 'production' ? ['@data/floodMockData'] : [],
+    },
+  },
 }));

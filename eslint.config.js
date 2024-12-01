@@ -9,7 +9,7 @@ import eslintImport from 'eslint-plugin-import';
 
 export default [
   {
-    ignores: ['dist']
+    ignores: ['dist'],
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -21,42 +21,42 @@ export default [
         ecmaVersion: 2020,
         sourceType: 'module',
         project: ['./tsconfig.app.json', './tsconfig.node.json'],
-        tsconfigRootDir: process.cwd()
+        tsconfigRootDir: process.cwd(),
       },
       globals: {
         ...globals.browser,
         chrome: 'readonly',
-        process: 'readonly'
-      }
+        process: 'readonly',
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       prettier: prettierPlugin,
       '@typescript-eslint': tseslint,
-      import: eslintImport
+      import: eslintImport,
     },
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true }
+        { allowConstantExport: true },
       ],
       ...tseslint.configs.recommended.rules,
       '@typescript-eslint/no-unused-expressions': [
         'error',
-        { allowShortCircuit: true, allowTernary: true }
+        { allowShortCircuit: true, allowTernary: true },
       ],
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_' }
+        { argsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-shadow': ['error'],
       'no-shadow': 'off',
       'prettier/prettier': [
         'error',
-        { singleQuote: true, trailingComma: 'all', tabWidth: 2 }
+        { singleQuote: true, trailingComma: 'all', tabWidth: 2 },
       ],
       'import/order': [
         'error',
@@ -65,26 +65,26 @@ export default [
             'builtin',
             'external',
             'internal',
-            ['parent', 'sibling', 'index']
+            ['parent', 'sibling', 'index'],
           ],
-          'newlines-between': 'always'
-        }
-      ]
+          'newlines-between': 'always',
+        },
+      ],
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
+        version: 'detect',
+      },
+    },
   },
   {
     files: ['*.config.{js,mjs,ts}'],
     languageOptions: {
       ecmaVersion: 2020,
-      sourceType: 'module'
+      sourceType: 'module',
     },
     rules: {
-      '@typescript-eslint/no-require-imports': 'off'
-    }
-  }
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ];
