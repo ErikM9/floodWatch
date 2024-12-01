@@ -229,9 +229,11 @@ const Options = () => {
               </p>
             </div>
           ) : (
-            <p className="text-base text-center">
-              Your area currently has no active alerts.
-            </p>
+            <div className="flex items-center justify-center h-[calc(50vh-5rem)] px-2">
+              <p className="text-base text-center">
+                Your area currently has no active alerts.
+              </p>
+            </div>
           )}
         </div>
       </div>

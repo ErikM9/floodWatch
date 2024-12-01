@@ -78,13 +78,13 @@ export const Popup = () => {
       </header>
 
       <div className="px-4 flex flex-col justify-around items-center h-full">
-        <div className="shadow-lg bg-white w-full h-auto px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
+        <div className="shadow-lg bg-white w-full h-[384px] px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
           <div>
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
               Current Alert
             </h2>
             {isActiveFlood && alertData ? (
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 overflow-y-auto text-sm">
                 <p>
                   <strong>Severity:</strong> {alertData.severity}
                 </p>
@@ -102,14 +102,14 @@ export const Popup = () => {
                   <strong>Description:</strong> {alertData.description}
                 </p>
                 <div>
-                  <p className="bg-yellow-100 p-4 border rounded-xl">
+                  <p className="bg-yellow-100 p-4 border text-center text-pretty rounded-xl">
                     For a full flood report, click the{' '}
                     <span className="font-bold">settings</span> button.
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-base text-center">
+              <p className="text-base text-center text-pretty">
                 {' '}
                 Your area currently has no active alerts.
               </p>
