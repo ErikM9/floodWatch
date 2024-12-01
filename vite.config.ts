@@ -1,9 +1,15 @@
+import { resolve } from 'path';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { resolve } from 'path';
 import babel from '@rollup/plugin-babel';
-import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -18,7 +24,7 @@ export default defineConfig(({ mode }) => ({
         { src: 'src/chrome-extension/public/192.png', dest: './public' }
       ]
     }),
-    // Add Babel plugin only in production
+
     mode === 'production' &&
       babel({
         babelHelpers: 'bundled',

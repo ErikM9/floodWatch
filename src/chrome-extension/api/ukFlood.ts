@@ -1,11 +1,12 @@
 // WHEN WORKING WITH THE API
 
 import axios from 'axios';
+
 import {
   ApiFloodWarning,
   ApiPolygonData,
   FloodResponse,
-  PolygonResponse
+  PolygonResponse,
 } from '@/types/api';
 
 // URL for the floods and polygons API endpoints
@@ -33,7 +34,7 @@ export async function fetchFloodWarnings(): Promise<ApiFloodWarning[]> {
         severityLevel: flood.severityLevel,
         message: flood.message,
         timeMessageChanged: flood.timeMessageChanged,
-        polygonData: (await fetchPolygonData(flood.floodAreaID)) || []
+        polygonData: (await fetchPolygonData(flood.floodAreaID)) || [],
       };
       floodWarnings.push(floodDetails);
     }
@@ -46,7 +47,7 @@ export async function fetchFloodWarnings(): Promise<ApiFloodWarning[]> {
 }
 
 export async function fetchPolygonData(
-  floodAreaID: string
+  floodAreaID: string,
 ): Promise<ApiPolygonData[]> {
   const polygonEndpoint = `${polygonAPIBase}/${floodAreaID}/polygon`;
 
@@ -58,14 +59,14 @@ export async function fetchPolygonData(
   } catch (error) {
     console.error(
       `Error fetching polygon for flood area ${floodAreaID}:`,
-      error
+      error,
     );
     return [];
   }
 }
 
 export function extractCoordinates(
-  polygonData: PolygonResponse
+  polygonData: PolygonResponse,
 ): ApiPolygonData[] {
   return polygonData.features.map((feature) => {
     const geometryType = feature.geometry.type;
@@ -79,8 +80,8 @@ export function extractCoordinates(
       description: feature.properties.DESCRIP,
       geometry: {
         type: geometryType,
-        coordinates: feature.geometry.coordinates
-      }
+        coordinates: feature.geometry.coordinates,
+      },
     };
   });
 }

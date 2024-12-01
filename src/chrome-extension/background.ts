@@ -1,5 +1,6 @@
 import { fetchFloodWarnings } from './api/ukFlood';
 import { getAndLogFloodData, isUserFlooded } from './services/FloodDataService';
+
 import { BackgroundPopupMessage } from '@/types/alertMessage';
 import { FloodWarning, StorageData } from '@/types/types';
 
@@ -95,7 +96,8 @@ async function checkIfUserIsFlooded(): Promise<void> {
         message: result?.floodedPolygonData?.message || '',
         riverOrSea: result?.floodedPolygonData?.riverOrSea || '',
         county: result?.floodedPolygonData?.county || '',
-        timeMessageChanged: result?.floodedPolygonData?.timeMessageChanged || ''
+        timeMessageChanged:
+          result?.floodedPolygonData?.timeMessageChanged || '',
       };
 
       const { alertsEnabled, lastSentAlert } = await new Promise<StorageData>(
@@ -105,11 +107,11 @@ async function checkIfUserIsFlooded(): Promise<void> {
             (data) => {
               resolve({
                 alertsEnabled: data.alertsEnabled || false,
-                lastSentAlert: data.lastSentAlert || null
+                lastSentAlert: data.lastSentAlert || null,
               });
-            }
+            },
           );
-        }
+        },
       );
 
       console.log('Last Sent Alert:', lastSentAlert);
@@ -119,11 +121,11 @@ async function checkIfUserIsFlooded(): Promise<void> {
         chrome.storage.local.set(
           {
             lastSentAlert: popupMessage,
-            isActiveFlood: true
+            isActiveFlood: true,
           },
           () => {
             console.log('Flood report updated in storage:', popupMessage);
-          }
+          },
         );
 
         if (alertsEnabled) {
@@ -133,7 +135,7 @@ async function checkIfUserIsFlooded(): Promise<void> {
             lastSentAlert.id === popupMessage.id
           ) {
             console.log(
-              'The alert is still the same. No new notification sent.'
+              'The alert is still the same. No new notification sent.',
             );
             return;
           }
@@ -144,7 +146,7 @@ async function checkIfUserIsFlooded(): Promise<void> {
             title: 'Your area at risk!',
             message: `Warning: ${result.floodedPolygonData?.severity || ''}.`,
             priority: 2,
-            requireInteraction: true
+            requireInteraction: true,
           });
         } else {
           console.log('Alerts are off. No notification sent.');
@@ -155,11 +157,11 @@ async function checkIfUserIsFlooded(): Promise<void> {
         chrome.storage.local.set(
           {
             isActiveFlood: false,
-            lastSentAlert: null
+            lastSentAlert: null,
           },
           () => {
             console.log('Marked flood as inactive in storage.');
-          }
+          },
         );
       }
     } catch (error) {

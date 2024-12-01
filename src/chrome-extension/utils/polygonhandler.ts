@@ -18,13 +18,13 @@ export function handlePolygonData(polygonData: PolygonData): Array<{
       TA_NAME,
       DESCRIP,
       LA_NAME,
-      RIVER_SEA
+      RIVER_SEA,
     };
   });
 }
 
 export function processPolygons(
-  polygonData: PolygonData
+  polygonData: PolygonData,
 ): GeoJSONFeatureCollection {
   return {
     type: 'FeatureCollection',
@@ -40,16 +40,16 @@ export function processPolygons(
         type: 'Feature',
         geometry: {
           type: feature.geometry.type,
-          coordinates: validCoords
+          coordinates: validCoords,
         },
         properties: {
           AREA: feature.properties.AREA,
           TA_NAME: feature.properties.TA_NAME,
           DESCRIP: feature.properties.DESCRIP,
           LA_NAME: feature.properties.LA_NAME,
-          RIVER_SEA: feature.properties.RIVER_SEA
-        }
+          RIVER_SEA: feature.properties.RIVER_SEA,
+        },
       };
-    })
+    }),
   };
 }

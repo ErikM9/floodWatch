@@ -1,12 +1,18 @@
 import '../global.css';
 import { Mail } from 'lucide-react';
 import { BarLoader } from 'react-spinners';
-import logoImage from './../public/logo.svg';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { format, parseISO } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { LatLngTuple } from 'leaflet';
+import { useEffect, useState } from 'react';
+
+import { userAddress } from '../api/geocoding';
+import logoImage from './../public/logo.svg';
+import UkMap from '../app-components/Map';
+
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -14,19 +20,15 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { userAddress } from '../api/geocoding';
-import { LatLngTuple } from 'leaflet';
-import { useEffect, useState } from 'react';
-import UkMap from '../app-components/Map';
+import { Button } from '@/components/ui/button';
 import { optionMessage } from '@/types/alertMessage';
 
 const formSchema = z.object({
   address: z.string().min(5, {
-    message: 'Address must be at least 5 characters.'
-  })
+    message: 'Address must be at least 5 characters.',
+  }),
 });
 
 const Options = () => {
@@ -38,8 +40,8 @@ const Options = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      address: ''
-    }
+      address: '',
+    },
   });
 
   useEffect(() => {
@@ -51,12 +53,12 @@ const Options = () => {
         setAlertData(result.lastSentAlert ?? null);
         setIsActiveFlood(result.isActiveFlood ?? false);
         setLoading(false);
-      }
+      },
     );
 
     const handleStorageChange = (
       changes: { [key: string]: chrome.storage.StorageChange },
-      namespace: string
+      namespace: string,
     ) => {
       if (namespace === 'local') {
         if (changes.userLocation) {
@@ -85,7 +87,7 @@ const Options = () => {
     if (location) {
       const newLocation: LatLngTuple = [location.latitude, location.longitude];
       console.log(
-        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`
+        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`,
       );
       setUserLocation(newLocation);
 
@@ -210,7 +212,7 @@ const Options = () => {
                 {alertData.timeMessageChanged
                   ? format(
                       parseISO(alertData.timeMessageChanged),
-                      'do MMMM yyyy HH:mm'
+                      'do MMMM yyyy HH:mm',
                     )
                   : 'no information available'}
               </p>

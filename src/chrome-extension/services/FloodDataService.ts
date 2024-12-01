@@ -1,13 +1,15 @@
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
-import { getFloodWarningsFromDB } from '../background';
 import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
+
+import { getFloodWarningsFromDB } from '../background';
+
 import { FloodWithPolygonData } from '@/types/floodDataService';
 
 let listenerAdded = false;
 
 export function getAndLogFloodData(
-  callback: (floodData: FloodWithPolygonData[]) => void
+  callback: (floodData: FloodWithPolygonData[]) => void,
 ): void {
   getFloodWarningsFromDB()
     .then((floodData) => {
@@ -24,7 +26,7 @@ export function getAndLogFloodData(
         .then((updatedFloodData) => {
           console.log(
             'Updated flood data detected in service IndexedDB',
-            updatedFloodData
+            updatedFloodData,
           );
           callback(updatedFloodData);
 
@@ -35,7 +37,7 @@ export function getAndLogFloodData(
         .catch((error) => {
           console.error(
             'Error fetching updated flood data from IndexedDB',
-            error
+            error,
           );
         });
     }, 900000); // 15min interval
@@ -63,7 +65,7 @@ export function logPolygonsFromFloodWarnings(): Promise<
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged
+          timeMessageChanged,
         } = flood;
 
         allFloodData.push({
@@ -75,7 +77,7 @@ export function logPolygonsFromFloodWarnings(): Promise<
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged
+          timeMessageChanged,
         });
       });
 
@@ -115,7 +117,7 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
         if (
           booleanPointInPolygon(userLocation, {
             type: 'Polygon',
-            coordinates: polygonCoordinates
+            coordinates: polygonCoordinates,
           })
         ) {
           isFlooded = true;
@@ -129,7 +131,7 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
           if (
             booleanPointInPolygon(userLocation, {
               type: 'Polygon',
-              coordinates: polygon
+              coordinates: polygon,
             })
           ) {
             isFlooded = true;
@@ -157,7 +159,7 @@ getAndLogFloodData((floodData) => {
 });
 
 export const MapPolygon = (
-  floodData: FloodWithPolygonData[]
+  floodData: FloodWithPolygonData[],
 ): FeatureCollection => {
   return {
     type: 'FeatureCollection',
@@ -169,22 +171,22 @@ export const MapPolygon = (
           return {
             type: 'Feature',
             properties: {
-              severityLevel: data.severityLevel
+              severityLevel: data.severityLevel,
             },
-            geometry: geometry as Polygon
+            geometry: geometry as Polygon,
           };
         } else if (geometry.type === 'MultiPolygon') {
           return {
             type: 'Feature',
             properties: {
-              severityLevel: data.severityLevel
+              severityLevel: data.severityLevel,
             },
-            geometry: geometry as MultiPolygon
+            geometry: geometry as MultiPolygon,
           };
         } else {
           throw new Error(`unsupported geometry type: ${geometry.type}`);
         }
       })
-      .filter((feature) => feature !== undefined)
+      .filter((feature) => feature !== undefined),
   };
 };

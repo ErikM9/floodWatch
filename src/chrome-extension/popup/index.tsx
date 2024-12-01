@@ -1,6 +1,8 @@
 import '../global.css';
-import logoImage from './../public/logo.svg';
 import { useEffect, useState } from 'react';
+
+import logoImage from './../public/logo.svg';
+
 import { Button } from '@/components/ui/button';
 import { popupMessage } from '@/types/alertMessage';
 
@@ -16,12 +18,12 @@ export const Popup = () => {
         setAlertsEnabled(result.alertsEnabled ?? false);
         setAlertData(result.lastSentAlert ?? null);
         setIsActiveFlood(result.isActiveFlood ?? false);
-      }
+      },
     );
 
     const storageListener = (
       changes: { [key: string]: chrome.storage.StorageChange },
-      areaName: string
+      areaName: string,
     ) => {
       if (areaName === 'local') {
         if (changes.alertsEnabled) {
@@ -55,14 +57,14 @@ export const Popup = () => {
     1: '1 - severe flooding, danger to life!',
     2: '2 - flooding is expected, immediate action required!',
     3: '3 - flooding is possible, be prepared!',
-    4: '4 - Warning no longer in force!'
+    4: '4 - Warning no longer in force!',
   };
 
   const severityClasses: { [key: number]: string } = {
     1: 'text-[#FF0000]',
     2: 'text-[#FFA500]',
     3: 'text-[#218ced]',
-    4: 'text-[#008000]'
+    4: 'text-[#008000]',
   };
 
   return (
