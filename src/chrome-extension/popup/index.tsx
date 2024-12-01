@@ -109,7 +109,10 @@ export const Popup = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-base text-center">No active alerts</p>
+              <p className="text-base text-center">
+                {' '}
+                Your area currently has no active alerts.
+              </p>
             )}
           </div>
 
@@ -127,7 +130,7 @@ export const Popup = () => {
         </div>
 
         <div className="mt-5 mb-5">
-          <Button asChild className="bg-primaryFlood-dark text-white">
+          <Button asChild className=" text-white">
             <a href="/options.html" target="_blank" rel="noopener noreferrer">
               Settings
             </a>

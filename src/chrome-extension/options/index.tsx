@@ -129,7 +129,7 @@ const Options = () => {
         </div>
       </header>
 
-      <div className="mt-16 flex flex-col pb-10 lg:flex-row justify-center items-start mx-4 lg:mx-auto max-w-[1400px] gap-8 bg-gray-50">
+      <div className="mt-16 flex flex-col px-4 pb-10 lg:flex-row justify-center items-start mx-4 lg:mx-auto max-w-[1400px] gap-8 bg-gray-50">
         <div className="flex flex-col justify-start items-start gap-8 w-full">
           <div className="w-full">
             {loading ? (
@@ -171,8 +171,11 @@ const Options = () => {
                     )}
                   />
                   <div className="flex justify-center lg:justify-start lg:items-start">
-                    <Button type="submit" className="mx-auto lg:mx-0">
-                      Submit
+                    <Button
+                      type="submit"
+                      aria-label="button to show the user's location"
+                      className="mx-auto lg:mx-0">
+                      View my location
                     </Button>
                   </div>
                 </form>
@@ -226,7 +229,9 @@ const Options = () => {
               </p>
             </div>
           ) : (
-            <p className="text-base text-center">No active alerts</p>
+            <p className="text-base text-center">
+              Your area currently has no active alerts.
+            </p>
           )}
         </div>
       </div>
