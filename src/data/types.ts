@@ -1,4 +1,3 @@
-// types.ts
 export interface FloodArea {
   '@id': string;
   county: string;
@@ -39,7 +38,7 @@ export interface PolygonFeature {
   type: string;
   geometry: {
     type: string;
-    coordinates: number[][][] | number[][][][]; // Nested arrays
+    coordinates: number[][][] | number[][][][];
   };
   properties: {
     AREA: string;
@@ -48,8 +47,8 @@ export interface PolygonFeature {
     DESCRIP: string;
     LA_NAME: string;
     RIVER_SEA: string;
-    PARENT?: string; // Optional
-    QDIAL?: string; // Optional
+    PARENT?: string;
+    QDIAL?: string;
   };
 }
 export interface PolygonResponse {

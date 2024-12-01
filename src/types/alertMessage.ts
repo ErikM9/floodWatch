@@ -13,3 +13,14 @@ export interface popupMessage {
   severity: string;
   description: string;
 }
+
+export interface BackgroundPopupMessage {
+  id: string;
+  severityLevel: string;
+  severity: string;
+  description: string;
+  message: string;
+  riverOrSea: string;
+  county: string;
+  timeMessageChanged: string;
+}

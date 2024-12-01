@@ -1,7 +1,13 @@
 // WHEN WORKING WITH THE API
 
 import axios from 'axios';
-import { FloodResponse, PolygonResponse } from '@/types/api';
+
+import {
+  ApiFloodWarning,
+  ApiPolygonData,
+  FloodResponse,
+  PolygonResponse,
+} from '@/types/api';
 
 // URL for the floods and polygons API endpoints
 const floodAPI = 'https://environment.data.gov.uk/flood-monitoring/id/floods';
@@ -11,16 +17,15 @@ const polygonAPIBase =
   'https://environment.data.gov.uk/flood-monitoring/id/floodAreas';
 // const polygonAPIBase = 'http://localhost:3000/floodAreas';
 
-// Function to extract the flood warning details
-export async function fetchFloodWarnings(): Promise<any[]> {
+export async function fetchFloodWarnings(): Promise<ApiFloodWarning[]> {
   try {
     const response = await axios.get<FloodResponse>(floodAPI);
     console.log('response from API', response);
     const floods = response.data.items;
-    const floodWarnings: any[] = [];
+    const floodWarnings: ApiFloodWarning[] = [];
     console.log('flood warnings from the API', floodWarnings);
     for (const flood of floods) {
-      const floodDetails = {
+      const floodDetails: ApiFloodWarning = {
         id: flood.floodAreaID,
         description: flood.description,
         county: flood.floodArea.county,
@@ -29,7 +34,7 @@ export async function fetchFloodWarnings(): Promise<any[]> {
         severityLevel: flood.severityLevel,
         message: flood.message,
         timeMessageChanged: flood.timeMessageChanged,
-        polygonData: await fetchPolygonData(flood.floodAreaID) // Fetch polygon data dynamically
+        polygonData: (await fetchPolygonData(flood.floodAreaID)) || [],
       };
       floodWarnings.push(floodDetails);
     }
@@ -41,43 +46,44 @@ export async function fetchFloodWarnings(): Promise<any[]> {
   }
 }
 
-// Function to fetch polygon data (handles both Polygon and MultiPolygon)
-export async function fetchPolygonData(floodAreaID: string): Promise<any> {
+export async function fetchPolygonData(
+  floodAreaID: string,
+): Promise<ApiPolygonData[]> {
   const polygonEndpoint = `${polygonAPIBase}/${floodAreaID}/polygon`;
 
   try {
     const response = await axios.get<PolygonResponse>(polygonEndpoint);
     const polygonData = response.data;
-    // console.log("polygon end point:", polygonData)
+    console.log('polygon end point:', polygonData);
     return extractCoordinates(polygonData);
   } catch (error) {
     console.error(
       `Error fetching polygon for flood area ${floodAreaID}:`,
-      error
+      error,
     );
-    return null;
+    return [];
   }
 }
 
-// function to extract and handle both polygon and multiPolygon
-export function extractCoordinates(polygonData: PolygonResponse): any[] {
-  const features = polygonData.features;
-
-  // Iterate through the features and handle each one
-  const polygons = features.map((feature) => {
+export function extractCoordinates(
+  polygonData: PolygonResponse,
+): ApiPolygonData[] {
+  return polygonData.features.map((feature) => {
     const geometryType = feature.geometry.type;
+
+    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
+      throw new Error(`Unexpected geometry type: ${geometryType}`);
+    }
 
     return {
       area: feature.properties.AREA,
       description: feature.properties.DESCRIP,
       geometry: {
         type: geometryType,
-        coordinates: feature.geometry.coordinates
-      }
+        coordinates: feature.geometry.coordinates,
+      },
     };
   });
-
-  return polygons;
 }
 
 // FOR MOCK DATA

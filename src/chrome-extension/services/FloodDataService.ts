@@ -1,54 +1,15 @@
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
-import { getFloodWarningsFromDB } from '../background';
 import { FeatureCollection, Feature, Polygon, MultiPolygon } from 'geojson';
 
-interface PolygonData {
-  area: string;
-  description: string;
-  geometry: {
-    type: 'Polygon' | 'MultiPolygon';
-    coordinates: number[][][] | number[][][][];
-  };
-}
+import { getFloodWarningsFromDB } from '../background';
 
-interface PolygonDataTwo {
-  area: string;
-  description: string;
-  geometry: {
-    type: 'Polygon' | 'MultiPolygon';
-    coordinates: number[][][] | number[][][][];
-  };
-}
-
-interface FloodWarning {
-  id: string;
-  description: string;
-  county: string;
-  severity: string;
-  severityLevel: number;
-  message: string;
-  polygonData: PolygonDataTwo[];
-  riverOrSea: string;
-  timeMessageChanged: string;
-}
-
-interface FloodWithPolygonData {
-  id: string;
-  description: string;
-  county: string;
-  severity: string;
-  severityLevel: number;
-  message: string;
-  polygonData: PolygonData[];
-  riverOrSea: string;
-  timeMessageChanged: string;
-}
+import { FloodWithPolygonData } from '@/types/floodDataService';
 
 let listenerAdded = false;
 
 export function getAndLogFloodData(
-  callback: (floodData: FloodWarning[]) => void
+  callback: (floodData: FloodWithPolygonData[]) => void,
 ): void {
   getFloodWarningsFromDB()
     .then((floodData) => {
@@ -65,7 +26,7 @@ export function getAndLogFloodData(
         .then((updatedFloodData) => {
           console.log(
             'Updated flood data detected in service IndexedDB',
-            updatedFloodData
+            updatedFloodData,
           );
           callback(updatedFloodData);
 
@@ -76,7 +37,7 @@ export function getAndLogFloodData(
         .catch((error) => {
           console.error(
             'Error fetching updated flood data from IndexedDB',
-            error
+            error,
           );
         });
     }, 900000); // 15min interval
@@ -84,8 +45,10 @@ export function getAndLogFloodData(
   }
 }
 
-export function logPolygonsFromFloodWarnings(): Promise<any[]> {
-  const allFloodData: FloodWarning[] = [];
+export function logPolygonsFromFloodWarnings(): Promise<
+  FloodWithPolygonData[]
+> {
+  const allFloodData: FloodWithPolygonData[] = [];
   console.log('allFloodData:', allFloodData);
 
   return new Promise((resolve) => {
@@ -102,7 +65,7 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged
+          timeMessageChanged,
         } = flood;
 
         allFloodData.push({
@@ -114,7 +77,7 @@ export function logPolygonsFromFloodWarnings(): Promise<any[]> {
           message,
           polygonData,
           riverOrSea,
-          timeMessageChanged
+          timeMessageChanged,
         });
       });
 
@@ -154,7 +117,7 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
         if (
           booleanPointInPolygon(userLocation, {
             type: 'Polygon',
-            coordinates: polygonCoordinates
+            coordinates: polygonCoordinates,
           })
         ) {
           isFlooded = true;
@@ -168,7 +131,7 @@ export const isUserFlooded = async (floodData: FloodWithPolygonData[]) => {
           if (
             booleanPointInPolygon(userLocation, {
               type: 'Polygon',
-              coordinates: polygon
+              coordinates: polygon,
             })
           ) {
             isFlooded = true;
@@ -195,7 +158,9 @@ getAndLogFloodData((floodData) => {
   MapPolygon(floodData);
 });
 
-export const MapPolygon = (floodData: FloodWarning[]): FeatureCollection => {
+export const MapPolygon = (
+  floodData: FloodWithPolygonData[],
+): FeatureCollection => {
   return {
     type: 'FeatureCollection',
     features: floodData
@@ -206,22 +171,22 @@ export const MapPolygon = (floodData: FloodWarning[]): FeatureCollection => {
           return {
             type: 'Feature',
             properties: {
-              severityLevel: data.severityLevel
+              severityLevel: data.severityLevel,
             },
-            geometry: geometry as Polygon
+            geometry: geometry as Polygon,
           };
         } else if (geometry.type === 'MultiPolygon') {
           return {
             type: 'Feature',
             properties: {
-              severityLevel: data.severityLevel
+              severityLevel: data.severityLevel,
             },
-            geometry: geometry as MultiPolygon
+            geometry: geometry as MultiPolygon,
           };
         } else {
           throw new Error(`unsupported geometry type: ${geometry.type}`);
         }
       })
-      .filter((feature) => feature !== undefined)
+      .filter((feature) => feature !== undefined),
   };
 };

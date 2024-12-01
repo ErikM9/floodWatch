@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { getAndLogFloodData, MapPolygon } from '../services/FloodDataService';
+import { BarLoader } from 'react-spinners';
 import {
   FeatureCollection,
   Feature,
   Geometry,
-  GeoJsonProperties
+  GeoJsonProperties,
 } from 'geojson';
 import { Icon, LatLngTuple } from 'leaflet';
+
+import { getAndLogFloodData, MapPolygon } from '../services/FloodDataService';
 import { MapUpdater } from './MapUpdater';
 
 interface MapProps {
@@ -17,7 +19,7 @@ interface MapProps {
 
 const mapStyle = {
   height: '50vh',
-  width: '100%'
+  width: '100%',
 };
 
 const UkMap: React.FC<MapProps> = ({ userLocation }) => {
@@ -35,7 +37,7 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
   }, []);
 
   const styleFeature = (
-    feature: Feature<Geometry, GeoJsonProperties> | undefined
+    feature: Feature<Geometry, GeoJsonProperties> | undefined,
   ) => {
     let fillColor = '#000000';
 
@@ -67,7 +69,7 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
       color: fillColor,
       weight: 2,
       opacity: 1,
-      fillOpacity: 0.5
+      fillOpacity: 0.5,
     };
   };
 
@@ -79,14 +81,18 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    shadowSize: [41, 41],
   });
 
   return (
     <div>
       {floodData ? (
         <>
-          <MapContainer center={center} zoom={zoom} style={mapStyle}>
+          <MapContainer
+            className="rounded-lg shadow-lg"
+            center={center}
+            zoom={zoom}
+            style={mapStyle}>
             <TileLayer
               attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -102,7 +108,9 @@ const UkMap: React.FC<MapProps> = ({ userLocation }) => {
           </MapContainer>
         </>
       ) : (
-        <p>Loading flood data...</p>
+        <div className="flex justify-center items-center h-[50vh]">
+          <BarLoader />
+        </div>
       )}
     </div>
   );

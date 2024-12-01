@@ -1,26 +1,39 @@
 import '../global.css';
-import logoImage from './../public/logo.svg';
 import { useEffect, useState } from 'react';
+
+import logoImage from './../public/logo.svg';
+
 import { Button } from '@/components/ui/button';
 import { popupMessage } from '@/types/alertMessage';
 
 export const Popup = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [alertData, setAlertData] = useState<popupMessage | null>(null);
+  const [isActiveFlood, setIsActiveFlood] = useState(false);
 
   useEffect(() => {
-    chrome.storage.local.get(['alertsEnabled', 'lastSentAlert'], (result) => {
-      setAlertsEnabled(result.alertsEnabled ?? false);
-      setAlertData(result.lastSentAlert ?? null);
-    });
+    chrome.storage.local.get(
+      ['alertsEnabled', 'lastSentAlert', 'isActiveFlood'],
+      (result) => {
+        setAlertsEnabled(result.alertsEnabled ?? false);
+        setAlertData(result.lastSentAlert ?? null);
+        setIsActiveFlood(result.isActiveFlood ?? false);
+      },
+    );
 
-    const storageListener = (changes: any, areaName: string) => {
+    const storageListener = (
+      changes: { [key: string]: chrome.storage.StorageChange },
+      areaName: string,
+    ) => {
       if (areaName === 'local') {
         if (changes.alertsEnabled) {
           setAlertsEnabled(changes.alertsEnabled.newValue);
         }
         if (changes.lastSentAlert) {
           setAlertData(changes.lastSentAlert.newValue);
+        }
+        if (changes.isActiveFlood) {
+          setIsActiveFlood(changes.isActiveFlood.newValue);
         }
       }
     };
@@ -40,28 +53,18 @@ export const Popup = () => {
     });
   };
 
-  //TODO this is not used anymore. Recheck if need or not
-  chrome.runtime.onMessage.addListener((message) => {
-    console.log('Message received in popup:', message);
-
-    if (message.type === 'update_popup') {
-      const popupMessage = message.data;
-      console.log('Popup message data:', popupMessage);
-    }
-  });
-
   const severityTextMap: { [key: number]: string } = {
     1: '1 - severe flooding, danger to life!',
     2: '2 - flooding is expected, immediate action required!',
     3: '3 - flooding is possible, be prepared!',
-    4: '4 - Warning no longer in force!'
+    4: '4 - Warning no longer in force!',
   };
 
   const severityClasses: { [key: number]: string } = {
     1: 'text-[#FF0000]',
     2: 'text-[#FFA500]',
     3: 'text-[#218ced]',
-    4: 'text-[#008000]'
+    4: 'text-[#008000]',
   };
 
   return (
@@ -77,13 +80,13 @@ export const Popup = () => {
       </header>
 
       <div className="px-4 flex flex-col justify-around items-center h-full">
-        <div className="shadow-lg bg-white w-full h-auto px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
+        <div className="shadow-lg bg-white w-full h-[384px] px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
           <div>
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
               Current Alert
             </h2>
-            {alertData ? (
-              <div className="space-y-3 text-sm">
+            {isActiveFlood && alertData ? (
+              <div className="space-y-3 overflow-y-auto text-sm">
                 <p>
                   <strong>Severity:</strong> {alertData.severity}
                 </p>
@@ -101,14 +104,17 @@ export const Popup = () => {
                   <strong>Description:</strong> {alertData.description}
                 </p>
                 <div>
-                  <p className="bg-yellow-100 p-4 border rounded-xl">
+                  <p className="bg-yellow-100 p-4 border text-center text-pretty rounded-xl">
                     For a full flood report, click the{' '}
                     <span className="font-bold">settings</span> button.
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-base text-center">No active alerts</p>
+              <p className="text-base text-center text-pretty">
+                {' '}
+                Your area currently has no active alerts.
+              </p>
             )}
           </div>
 
@@ -126,7 +132,7 @@ export const Popup = () => {
         </div>
 
         <div className="mt-5 mb-5">
-          <Button asChild className="bg-primaryFlood-dark text-white">
+          <Button asChild className=" text-white">
             <a href="/options.html" target="_blank" rel="noopener noreferrer">
               Settings
             </a>
