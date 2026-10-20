@@ -1,15 +1,13 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import prettierPlugin from 'eslint-plugin-prettier';
 import eslintImport from 'eslint-plugin-import';
 
 export default [
   {
-    ignores: ['dist'],
+    ignores: ['dist', 'site', 'coverage', 'playwright-report', 'test-results'],
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -26,23 +24,16 @@ export default [
       globals: {
         ...globals.browser,
         chrome: 'readonly',
-        process: 'readonly',
       },
     },
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-      prettier: prettierPlugin,
       '@typescript-eslint': tseslint,
       import: eslintImport,
     },
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
       ...tseslint.configs.recommended.rules,
       '@typescript-eslint/no-unused-expressions': [
         'error',
@@ -54,10 +45,6 @@ export default [
       ],
       '@typescript-eslint/no-shadow': ['error'],
       'no-shadow': 'off',
-      'prettier/prettier': [
-        'error',
-        { singleQuote: true, trailingComma: 'all', tabWidth: 2 },
-      ],
       'import/order': [
         'error',
         {
@@ -71,20 +58,23 @@ export default [
         },
       ],
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
+  },
+  {
+    files: [
+      '*.config.{js,ts}',
+      'website/*.config.{js,ts}',
+      'tests/e2e/**/*.ts',
+    ],
+    languageOptions: {
+      globals: globals.node,
     },
   },
   {
-    files: ['*.config.{js,mjs,ts}'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      sourceType: 'module',
-    },
+    files: ['tests/e2e/**/*.ts'],
+    /* Playwright fixtures start from an empty pattern and call use, which the React hooks rule takes for a hook */
     rules: {
-      '@typescript-eslint/no-require-imports': 'off',
+      'no-empty-pattern': 'off',
+      'react-hooks/rules-of-hooks': 'off',
     },
   },
 ];

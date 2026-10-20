@@ -1,28 +1,31 @@
-import { GeocodingLocation } from '@/types/geocoding';
+import { AddressLookup, NominatimPlace } from '@/types/geocoding';
 
-export async function userAddress(
-  address: string,
-): Promise<GeocodingLocation | null> {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=gb`;
+/* Picks the first match in England, as the Environment Agency only issues warnings for England */
+export async function userAddress(address: string): Promise<AddressLookup> {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=5&countrycodes=gb&addressdetails=1`;
 
   try {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Could not fetch geocoding data: ${response.statusText}`);
+      return { status: 'failed' };
     }
 
-    const data = await response.json();
+    const places: NominatimPlace[] = await response.json();
+    const place = places.find(
+      (match) => match.address?.['ISO3166-2-lvl4'] === 'GB-ENG',
+    );
 
-    if (data.length > 0) {
-      const { lat, lon } = data[0];
-      return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
-    } else {
-      console.warn('No results found for the given address');
-      return null;
+    if (!place) {
+      return { status: places.length ? 'outside-england' : 'not-found' };
     }
-  } catch (error) {
-    console.error('Geocoding error: ', error);
-    return null;
+
+    return {
+      status: 'found',
+      latitude: parseFloat(place.lat),
+      longitude: parseFloat(place.lon),
+    };
+  } catch {
+    return { status: 'failed' };
   }
 }

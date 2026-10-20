@@ -1,0 +1,103 @@
+@config "../tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white font-sans text-body antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  @screen xl {
+    body {
+      font-size: 1.1875rem;
+    }
+  }
+
+  @screen 2xl {
+    body {
+      font-size: 1.3125rem;
+    }
+  }
+
+  /* Balanced wrapping gives a heading lines of much the same length */
+  h1,
+  h2,
+  h3 {
+    @apply text-balance font-display text-ink;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid theme('colors.estuary');
+    outline-offset: 3px;
+  }
+
+  /* Leaves a gap above a section the navigation jumps to */
+  [id] {
+    scroll-margin-top: 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* Spans the screen with a margin that grows with it, up to the widest monitors */
+  .wrap {
+    @apply mx-auto w-full max-w-[2200px] px-5 sm:px-10 lg:px-[4vw];
+  }
+
+  .section-title {
+    @apply text-center text-[1.75rem] font-bold leading-tight sm:text-[2.25rem] xl:text-[3rem] 2xl:text-[3.5rem];
+  }
+
+  .section-intro {
+    @apply mx-auto mt-5 max-w-[80ch] text-balance text-center;
+  }
+
+  /* The parts of the page are separated by a thin rule in the estuary blue */
+  .section-rule {
+    @apply border-t-2 border-estuary;
+  }
+
+  /* The buttons have a set height, so their text can grow without them, and change colour over a third of a second */
+  .button {
+    @apply inline-flex h-[55px] items-center justify-center rounded-md border-2 border-estuary px-4 text-xl font-semibold leading-none no-underline transition-colors duration-300 ease-out motion-reduce:transition-none xl:h-16 xl:px-6 xl:text-2xl 2xl:px-5 2xl:text-[1.75rem];
+  }
+
+  .button-primary {
+    @apply button bg-estuary text-white hover:border-ink hover:bg-ink;
+  }
+
+  .button-secondary {
+    @apply button bg-white text-estuary hover:border-ink hover:bg-tint hover:text-ink;
+  }
+
+  /* The header's links and the text links only change colour, over a third of a second */
+  .nav-link {
+    @apply inline-block rounded-md px-3 py-1.5 transition-colors duration-300 ease-out hover:text-alert motion-reduce:transition-none;
+  }
+
+  .text-link {
+    @apply font-medium text-estuary transition-colors duration-300 hover:text-alert motion-reduce:transition-none;
+  }
+
+  /* The footer's links are set bolder than the text around them, so they stand out without an underline */
+  .footer-link {
+    @apply font-semibold text-white transition-colors duration-300 hover:text-tint motion-reduce:transition-none;
+  }
+}

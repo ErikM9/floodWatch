@@ -1,23 +1,31 @@
 import '../global.css';
+import { Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import logoImage from './../public/logo.svg';
+import { severityLevels } from '../severity';
 
 import { Button } from '@/components/ui/button';
-import { popupMessage } from '@/types/alertMessage';
+import { AlertMessage } from '@/types/types';
+
+const levelNames = [
+  [1, 'Severe: danger to life'],
+  [2, 'Warning: flooding expected'],
+  [3, 'Alert: flooding possible'],
+] as const;
 
 export const Popup = () => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);
-  const [alertData, setAlertData] = useState<popupMessage | null>(null);
-  const [isActiveFlood, setIsActiveFlood] = useState(false);
+  const [alertData, setAlertData] = useState<AlertMessage | null>(null);
+  const [hasLocation, setHasLocation] = useState(false);
 
   useEffect(() => {
     chrome.storage.local.get(
-      ['alertsEnabled', 'lastSentAlert', 'isActiveFlood'],
+      ['alertsEnabled', 'lastSentAlert', 'userLocation'],
       (result) => {
         setAlertsEnabled(result.alertsEnabled ?? false);
         setAlertData(result.lastSentAlert ?? null);
-        setIsActiveFlood(result.isActiveFlood ?? false);
+        setHasLocation(Boolean(result.userLocation));
       },
     );
 
@@ -32,8 +40,8 @@ export const Popup = () => {
         if (changes.lastSentAlert) {
           setAlertData(changes.lastSentAlert.newValue);
         }
-        if (changes.isActiveFlood) {
-          setIsActiveFlood(changes.isActiveFlood.newValue);
+        if (changes.userLocation) {
+          setHasLocation(Boolean(changes.userLocation.newValue));
         }
       }
     };
@@ -46,75 +54,84 @@ export const Popup = () => {
   }, []);
 
   const toggleAlerts = () => {
-    const newState = !alertsEnabled;
-    setAlertsEnabled(newState);
-    chrome.storage.local.set({ alertsEnabled: newState }, () => {
-      console.log(`Alerts are now ${newState ? 'ON' : 'OFF'}`);
-    });
+    chrome.storage.local.set({ alertsEnabled: !alertsEnabled });
   };
 
-  const severityTextMap: { [key: number]: string } = {
-    1: '1 - severe flooding, danger to life!',
-    2: '2 - flooding is expected, immediate action required!',
-    3: '3 - flooding is possible, be prepared!',
-    4: '4 - Warning no longer in force!',
-  };
-
-  const severityClasses: { [key: number]: string } = {
-    1: 'text-[#FF0000]',
-    2: 'text-[#FFA500]',
-    3: 'text-[#218ced]',
-    4: 'text-[#008000]',
-  };
+  const severity = alertData && severityLevels[alertData.severityLevel];
 
   return (
-    <div className="flex flex-col items-center bg-gray-50 w-[350px] h-[561px]">
-      <header className="flex flex-row items-center px-2 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex w-[150px] h-[30px] items-center justify-center mx-auto">
+    <div className="flex flex-col items-center bg-gray-50 w-[350px]">
+      <header className="relative flex flex-row items-center px-2 py-3 bg-white w-full">
+        <div className="flex w-[230px] h-[30px] items-center justify-center mx-auto">
           <img
             src={logoImage}
             className="max-w-full max-h-full object-contain"
             alt="FloodWatch icon"
           />
         </div>
+        <a
+          href="/options.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Settings"
+          className="absolute right-2 top-[7px] rounded-md p-1.5 text-black transition-colors duration-300 hover:text-alert">
+          <Settings size={27} aria-hidden="true" />
+        </a>
       </header>
 
-      <div className="px-4 flex flex-col justify-around items-center h-full">
-        <div className="shadow-lg bg-white w-full h-[384px] px-2 flex mt-4 flex-col justify-evenly border rounded-lg">
+      <div className="px-4 pb-4 flex flex-col items-center w-full">
+        <div className="bg-white w-full px-2 flex flex-col border border-line rounded-lg">
           <div>
             <h2 className="text-xl pt-3 text-center font-medium mb-4">
               Current Alert
             </h2>
-            {isActiveFlood && alertData ? (
+            {alertData ? (
               <div className="space-y-3 overflow-y-auto text-sm">
                 <p>
                   <strong>Severity:</strong> {alertData.severity}
                 </p>
                 <p>
                   <strong>Severity Level:</strong>{' '}
-                  <span
-                    className={
-                      severityClasses[Number(alertData.severityLevel)]
-                    }>
-                    {severityTextMap[Number(alertData.severityLevel)] ||
-                      'Unknown'}
+                  <span style={{ color: severity?.colour }}>
+                    {severity
+                      ? `${alertData.severityLevel} - ${severity.text}`
+                      : 'Unknown'}
                   </span>
                 </p>
                 <p className="text-pretty">
                   <strong>Description:</strong> {alertData.description}
                 </p>
                 <div>
-                  <p className="bg-yellow-100 p-4 border text-center text-pretty rounded-xl">
-                    For a full flood report, click the{' '}
-                    <span className="font-bold">settings</span> button.
+                  <p className="bg-yellow-100 p-4 border border-line text-center text-pretty rounded-xl">
+                    For a full flood report, open the{' '}
+                    <span className="font-bold">settings</span> with the gear
+                    above.
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-base text-center text-pretty">
-                {' '}
-                Your area currently has no active alerts.
-              </p>
+              <div className="space-y-4 text-center">
+                <p className="text-lg text-pretty">
+                  Your area currently has no active alerts.
+                </p>
+                <p className="text-sm text-gray-600 text-pretty">
+                  {hasLocation
+                    ? "FloodWatch checks your address against the Environment Agency's warnings every minute."
+                    : 'Save an address on the settings page, and FloodWatch will check it every minute.'}
+                </p>
+                <ul className="mx-auto w-fit space-y-1.5 text-sm text-left">
+                  {levelNames.map(([level, name]) => (
+                    <li key={level} className="flex items-center gap-2">
+                      <span
+                        aria-hidden="true"
+                        className="h-3 w-3 rounded-full border border-black/30"
+                        style={{ background: severityLevels[level].colour }}
+                      />
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
 
@@ -123,20 +140,13 @@ export const Popup = () => {
               Alerts are currently:{' '}
               <strong>{alertsEnabled ? 'ON' : 'OFF'}</strong>
             </p>
+            {/* Each button darkens within its own colour on hover */}
             <Button
-              className={`mt-5 ${alertsEnabled ? 'bg-red-500' : 'bg-green-500'} text-white`}
+              className={`mt-5 ${alertsEnabled ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'} text-white`}
               onClick={toggleAlerts}>
               {alertsEnabled ? 'Turn OFF Alerts' : 'Turn ON Alerts'}
             </Button>
           </div>
-        </div>
-
-        <div className="mt-5 mb-5">
-          <Button asChild className=" text-white">
-            <a href="/options.html" target="_blank" rel="noopener noreferrer">
-              Settings
-            </a>
-          </Button>
         </div>
       </div>
     </div>

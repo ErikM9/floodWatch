@@ -1,15 +1,9 @@
-import { resolve } from 'path';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import babel from '@rollup/plugin-babel';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -21,7 +15,6 @@ export default defineConfig(({ mode }) => ({
         { src: 'src/chrome-extension/public/32.png', dest: './public' },
         { src: 'src/chrome-extension/public/48.png', dest: './public' },
         { src: 'src/chrome-extension/public/128.png', dest: './public' },
-        { src: 'src/chrome-extension/public/192.png', dest: './public' },
       ],
     }),
 
@@ -29,7 +22,7 @@ export default defineConfig(({ mode }) => ({
       babel({
         babelHelpers: 'bundled',
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        plugins: mode === 'production' ? ['transform-remove-console'] : [],
+        plugins: ['transform-remove-console'],
       }),
   ],
   resolve: {
@@ -37,25 +30,19 @@ export default defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    open: '/popup-local.html',
-  },
   build: {
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, 'popup.html'),
-        options: resolve(__dirname, 'options.html'),
-        background: resolve(__dirname, 'src/chrome-extension/background.ts'),
-        content: resolve(__dirname, 'src/chrome-extension/content.ts'),
-        service: resolve(
+        popup: path.resolve(__dirname, 'popup.html'),
+        options: path.resolve(__dirname, 'options.html'),
+        background: path.resolve(
           __dirname,
-          'src/chrome-extension/services/FloodDataService.ts',
+          'src/chrome-extension/background.ts',
         ),
       },
       output: {
         entryFileNames: '[name].js',
       },
-      external: mode === 'production' ? ['@data/floodMockData'] : [],
     },
   },
 }));

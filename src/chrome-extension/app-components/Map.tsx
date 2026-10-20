@@ -9,8 +9,12 @@ import {
   GeoJsonProperties,
 } from 'geojson';
 import { Icon, LatLngTuple } from 'leaflet';
+import markerIcon from 'leaflet-color-markers/img/marker-icon-2x-green.png';
+import markerShadow from 'leaflet-color-markers/img/marker-shadow.png';
 
-import { getAndLogFloodData, MapPolygon } from '../services/FloodDataService';
+import { getFloodWarningsFromDB } from '../services/floodDatabase';
+import { toMapFeatures } from '../services/FloodDataService';
+import { severityLevels } from '../severity';
 import { MapUpdater } from './MapUpdater';
 
 interface MapProps {
@@ -18,97 +22,66 @@ interface MapProps {
 }
 
 const mapStyle = {
-  height: '50vh',
+  height: '560px',
   width: '100%',
 };
 
+const ukCenter: LatLngTuple = [54.0, -2.0];
+
+const customIcon = new Icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const styleFeature = (
+  feature: Feature<Geometry, GeoJsonProperties> | undefined,
+) => ({
+  color:
+    severityLevels[feature?.properties?.severityLevel]?.colour ?? '#000000',
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 0.5,
+});
+
 const UkMap: React.FC<MapProps> = ({ userLocation }) => {
-  const ukCenter: LatLngTuple = [54.0, -2.0];
   const center = userLocation || ukCenter;
   const zoom = userLocation ? 13 : 5.4;
 
   const [floodData, setFloodData] = useState<FeatureCollection | null>(null);
 
   useEffect(() => {
-    getAndLogFloodData((data) => {
-      const processedData = MapPolygon(data);
-      setFloodData(processedData);
-    });
+    getFloodWarningsFromDB()
+      .catch(() => [])
+      .then((floods) => setFloodData(toMapFeatures(floods)));
   }, []);
-
-  const styleFeature = (
-    feature: Feature<Geometry, GeoJsonProperties> | undefined,
-  ) => {
-    let fillColor = '#000000';
-
-    if (feature && feature.properties) {
-      const severityLevel = feature.properties.severityLevel;
-
-      switch (severityLevel) {
-        case 1:
-          fillColor = '#FF0000'; // red - Severe Flooding, Danger to Life.
-          break;
-        case 2:
-          fillColor = '#FFA500'; // orange - Flooding is Expected, Immediate Action Required.
-          break;
-        case 3:
-          fillColor = '#218ced'; // blue - Flooding is Possible, Be Prepared.
-          break;
-        case 4:
-          fillColor = '#008000'; // green - Warning no Longer in Force
-          break;
-        default:
-          console.warn('Unknown severity level:', severityLevel);
-          fillColor = '#000000';
-      }
-    } else {
-      console.warn('severityLevel missing');
-    }
-
-    return {
-      color: fillColor,
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.5,
-    };
-  };
-
-  const customIcon = new Icon({
-    iconUrl:
-      'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-    shadowUrl:
-      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
 
   return (
     <div>
       {floodData ? (
-        <>
-          <MapContainer
-            className="rounded-lg shadow-lg"
-            center={center}
-            zoom={zoom}
-            style={mapStyle}>
-            <TileLayer
-              attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <GeoJSON data={floodData} style={styleFeature} />
-            <MapUpdater center={center} zoom={zoom} />
+        <MapContainer
+          className="rounded-lg"
+          center={center}
+          zoom={zoom}
+          style={mapStyle}>
+          <TileLayer
+            attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <GeoJSON data={floodData} style={styleFeature} />
+          <MapUpdater center={center} zoom={zoom} />
 
-            {userLocation && (
-              <Marker position={userLocation} icon={customIcon}>
-                <Popup>Your location</Popup>
-              </Marker>
-            )}
-          </MapContainer>
-        </>
+          {userLocation && (
+            <Marker position={userLocation} icon={customIcon}>
+              <Popup>Your location</Popup>
+            </Marker>
+          )}
+        </MapContainer>
       ) : (
-        <div className="flex justify-center items-center h-[50vh]">
+        <div className="flex justify-center items-center h-[560px]">
           <BarLoader />
         </div>
       )}

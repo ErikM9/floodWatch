@@ -1,233 +1,131 @@
 import { fetchFloodWarnings } from './api/ukFlood';
-import { getAndLogFloodData, isUserFlooded } from './services/FloodDataService';
+import {
+  getFloodWarningsFromDB,
+  storeFloodWarningsInDB,
+} from './services/floodDatabase';
+import { findUserFlood } from './services/FloodDataService';
 
-import { BackgroundPopupMessage } from '@/types/alertMessage';
-import { FloodWarning, StorageData } from '@/types/types';
+import { AlertMessage } from '@/types/types';
 
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UkFloodWarningDB', 1);
-
-    request.onerror = (event) => {
-      reject(`database error: ${(event.target as IDBRequest).error}`);
-    };
-
-    request.onsuccess = (event) => {
-      resolve((event.target as IDBRequest).result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBRequest).result;
-      if (!db.objectStoreNames.contains('floodData')) {
-        db.createObjectStore('floodData', { keyPath: 'id' });
-        console.log('Created object store: floodData');
-      }
-    };
-  });
+interface StorageData {
+  alertsEnabled?: boolean;
+  lastSentAlert?: AlertMessage | null;
+  userLocation?: [number, number];
 }
 
-async function storeFloodWarningsInDB(data: FloodWarning[]): Promise<void> {
-  const db = await openDatabase();
-  const transaction = db.transaction(['floodData'], 'readwrite');
-  const objectStore = transaction.objectStore('floodData');
-  objectStore.put({ id: 'floodData', data });
-
-  return new Promise((resolve, reject) => {
-    transaction.oncomplete = () => resolve();
-    transaction.onerror = (event) => reject((event.target as IDBRequest).error);
-  });
-}
-
-export async function getFloodWarningsFromDB(): Promise<FloodWarning[]> {
-  const db = await openDatabase();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['floodData'], 'readonly');
-    const objectStore = transaction.objectStore('floodData');
-    const request = objectStore.get('floodData');
-
-    request.onerror = (event) => {
-      reject(`database error: ${(event.target as IDBRequest).error}`);
-    };
-
-    request.onsuccess = () => {
-      resolve(request.result?.data || []);
-    };
-  });
-}
-
+/* Keeps the stored warnings when the download fails, so a dropped connection doesn't read as the floods having ended */
 async function storeFloodWarnings(): Promise<void> {
   try {
-    const floodWarnings = await fetchFloodWarnings();
-    console.log('Flood warnings:', floodWarnings);
-
     const storedFloodData = await getFloodWarningsFromDB();
-    console.log('Stored flood data from IndexedDB:', storedFloodData);
+    const floodWarnings = await fetchFloodWarnings(storedFloodData);
 
-    const isDataChanged =
-      JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData);
-
-    if (isDataChanged) {
+    if (JSON.stringify(floodWarnings) !== JSON.stringify(storedFloodData)) {
       await storeFloodWarningsInDB(floodWarnings);
-      console.log('Flood data stored in IndexedDB');
-    } else {
-      console.log('Flood data has not changed');
     }
   } catch (error) {
     console.error('Error fetching and storing flood warnings:', error);
   }
 }
 
-async function checkIfUserIsFlooded(): Promise<void> {
-  console.log('checkIfUserIsFlooded invoked');
+async function checkIfUserIsFlooded(settingsChanged: boolean): Promise<void> {
+  const { alertsEnabled, lastSentAlert, userLocation } =
+    (await chrome.storage.local.get([
+      'alertsEnabled',
+      'lastSentAlert',
+      'userLocation',
+    ])) as StorageData;
+  const flood = userLocation
+    ? findUserFlood(await getFloodWarningsFromDB(), userLocation)
+    : null;
 
-  getAndLogFloodData(async (floodData) => {
-    try {
-      const result = await isUserFlooded(floodData);
-      console.log('Flood data received:', floodData);
-      console.log('Flood detection result:', result);
-
-      const popupMessage: BackgroundPopupMessage = {
-        id: result?.floodedPolygonData?.id || '',
-        severityLevel:
-          result?.floodedPolygonData?.severityLevel?.toString() || '',
-        severity: result?.floodedPolygonData?.severity || '',
-        description: result?.floodedPolygonData?.description || '',
-        message: result?.floodedPolygonData?.message || '',
-        riverOrSea: result?.floodedPolygonData?.riverOrSea || '',
-        county: result?.floodedPolygonData?.county || '',
-        timeMessageChanged:
-          result?.floodedPolygonData?.timeMessageChanged || '',
-      };
-
-      const { alertsEnabled, lastSentAlert } = await new Promise<StorageData>(
-        (resolve) => {
-          chrome.storage.local.get(
-            ['alertsEnabled', 'lastSentAlert'],
-            (data) => {
-              resolve({
-                alertsEnabled: data.alertsEnabled || false,
-                lastSentAlert: data.lastSentAlert || null,
-              });
-            },
-          );
-        },
-      );
-
-      console.log('Last Sent Alert:', lastSentAlert);
-      console.log('Current Popup Message:', popupMessage);
-
-      if (result?.isFlooded) {
-        chrome.storage.local.set(
-          {
-            lastSentAlert: popupMessage,
-            isActiveFlood: true,
-          },
-          () => {
-            console.log('Flood report updated in storage:', popupMessage);
-          },
-        );
-
-        if (alertsEnabled) {
-          if (
-            lastSentAlert &&
-            lastSentAlert.id &&
-            lastSentAlert.id === popupMessage.id
-          ) {
-            console.log(
-              'The alert is still the same. No new notification sent.',
-            );
-            return;
-          }
-
-          chrome.notifications.create('flood-alert', {
-            type: 'basic',
-            iconUrl: chrome.runtime.getURL('public/32.png'),
-            title: 'Your area at risk!',
-            message: `Warning: ${result.floodedPolygonData?.severity || ''}.`,
-            priority: 2,
-            requireInteraction: true,
-          });
-        } else {
-          console.log('Alerts are off. No notification sent.');
-        }
-      } else {
-        console.log('No flooding detected.');
-
-        chrome.storage.local.set(
-          {
-            isActiveFlood: false,
-            lastSentAlert: null,
-          },
-          () => {
-            console.log('Marked flood as inactive in storage.');
-          },
-        );
-      }
-    } catch (error) {
-      console.error('Error while checking flood status:', error);
-    }
-  });
-}
-
-async function initializeExtension() {
-  console.log('Initializing extension...');
-
-  const isFirstRun = await new Promise((resolve) => {
-    chrome.storage.local.get('isFirstRun', (data) => resolve(data.isFirstRun));
-  });
-
-  if (!isFirstRun) {
-    console.log('first run detected. Storing flood warnings!!!');
-    await storeFloodWarnings();
-    chrome.storage.local.set({ isFirstRun: true });
-  } else {
-    console.log('Subsequent run. Skipping initialization warnings.');
+  if (!flood) {
+    await chrome.storage.local.set({ lastSentAlert: null });
+    return;
   }
 
-  await checkIfUserIsFlooded();
+  const alert: AlertMessage = {
+    id: flood.id,
+    description: flood.description,
+    county: flood.county,
+    severity: flood.severity,
+    severityLevel: flood.severityLevel,
+    message: flood.message,
+    riverOrSea: flood.riverOrSea,
+    timeMessageChanged: flood.timeMessageChanged,
+  };
+  /* Any warning is news straight after a new location or alerts being turned on, and otherwise only a rise in level is */
+  const previous = settingsChanged ? null : lastSentAlert;
+  const isNews = !previous || alert.severityLevel < previous.severityLevel;
+
+  await chrome.storage.local.set({ lastSentAlert: alert });
+
+  /* Level 4 marks a lifted warning, so only the levels still in force notify */
+  if (alertsEnabled && isNews && alert.severityLevel < 4) {
+    chrome.notifications.create('flood-alert', {
+      type: 'basic',
+      iconUrl: chrome.runtime.getURL('public/128.png'),
+      title: 'Your area at risk!',
+      message: `Warning: ${alert.severity}.`,
+      priority: 2,
+      requireInteraction: true,
+    });
+  }
 }
 
-chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
+let checks: Promise<void> = Promise.resolve();
+
+/* Runs one check at a time, so an earlier check can't overwrite the outcome of a later one */
+function checkInTurn(settingsChanged = false): Promise<void> {
+  checks = checks
+    .catch(() => undefined)
+    .then(() => checkIfUserIsFlooded(settingsChanged));
+  return checks;
+}
+
+/* Calls an extension API every 25 seconds while the work runs, as Chrome stops a worker after 30 quiet seconds */
+async function keepAwake(work: Promise<void>): Promise<void> {
+  const keepAlive = setInterval(() => chrome.runtime.getPlatformInfo(), 25_000);
+
+  try {
+    await work;
+  } finally {
+    clearInterval(keepAlive);
+  }
+}
+
+let update: Promise<void> | null = null;
+
+/* Joins an update already under way instead of downloading the warnings a second time */
+function updateFloodStatus(): Promise<void> {
+  update ??= keepAwake(storeFloodWarnings().then(() => checkInTurn())).finally(
+    () => {
+      update = null;
+    },
+  );
+  return update;
+}
+
+/* Creating the alarm again would restart its minute every time the worker wakes, so it is only created when missing */
+chrome.alarms.get('checkFloods').then((alarm) => {
+  if (!alarm) {
+    chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
+  }
+});
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'checkFloods') {
-    console.log('Alarm triggered!');
-
-    await storeFloodWarnings();
-
-    const alertsEnabled = await new Promise((resolve) => {
-      chrome.storage.local.get('alertsEnabled', (result) => {
-        resolve(result.alertsEnabled || false);
-      });
-    });
-
-    if (alertsEnabled) {
-      await checkIfUserIsFlooded();
-    } else {
-      console.log('disabled alerts. No flood check.');
-    }
+    await updateFloodStatus();
   }
 });
 
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local') {
-    if (changes.alertsEnabled) {
-      const isEnabled = changes.alertsEnabled.newValue;
-      console.log(`Alerts enabled: ${isEnabled}`);
-
-      if (isEnabled) {
-        chrome.alarms.create('checkFloods', { periodInMinutes: 1 });
-        console.log('Flood check alarm created');
-      }
-    }
-
-    if (changes.userLocation) {
-      console.log('User location changed', changes.userLocation.newValue);
-      checkIfUserIsFlooded();
-    }
+chrome.storage.onChanged.addListener(async (changes, areaName) => {
+  if (
+    areaName === 'local' &&
+    (changes.userLocation || changes.alertsEnabled?.newValue)
+  ) {
+    await checkInTurn(true);
   }
 });
 
-chrome.runtime.onInstalled.addListener(() => initializeExtension());
-chrome.runtime.onStartup.addListener(() => initializeExtension());
+chrome.runtime.onInstalled.addListener(() => updateFloodStatus());
+chrome.runtime.onStartup.addListener(() => updateFloodStatus());

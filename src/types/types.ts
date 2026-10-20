@@ -1,26 +1,9 @@
-export interface LastSentAlert {
-  id: string;
-  severityLevel?: string;
-  severity?: string;
-  description?: string;
-  message?: string;
-  riverOrSea?: string;
-  county?: string;
-  timeMessageChanged?: string;
-}
+import { MultiPolygon, Polygon } from 'geojson';
 
-export interface StorageData {
-  alertsEnabled?: boolean;
-  lastSentAlert?: LastSentAlert;
-}
-
-interface PolygonData {
+export interface PolygonData {
   area: string;
   description: string;
-  geometry: {
-    type: 'Polygon' | 'MultiPolygon';
-    coordinates: number[][][] | number[][][][];
-  };
+  geometry: Polygon | MultiPolygon;
 }
 
 export interface FloodWarning {
@@ -34,3 +17,5 @@ export interface FloodWarning {
   timeMessageChanged: string;
   polygonData: PolygonData[];
 }
+
+export type AlertMessage = Omit<FloodWarning, 'polygonData'>;
