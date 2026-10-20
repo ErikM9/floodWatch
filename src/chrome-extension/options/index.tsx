@@ -1,11 +1,11 @@
 import '../global.css';
-import { Mail } from 'lucide-react';
 import { BarLoader } from 'react-spinners';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { format, parseISO } from 'date-fns';
 import { LatLngTuple } from 'leaflet';
+import { House } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { userAddress } from '../api/geocoding';
@@ -23,18 +23,25 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { optionMessage } from '@/types/alertMessage';
+import { AlertMessage } from '@/types/types';
 
 const formSchema = z.object({
-  address: z.string().min(5, {
-    message: 'Address must be at least 5 characters.',
+  address: z.string().trim().min(1, {
+    message: 'Please enter an address.',
   }),
 });
 
+const lookupErrors = {
+  'not-found':
+    "We couldn't find that address. Try adding the town or postcode.",
+  'outside-england':
+    'That address is outside England. We only support locations in England.',
+  failed: "We couldn't look up that address. Please try again.",
+};
+
 const Options = () => {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
-  const [alertData, setAlertData] = useState<optionMessage | null>(null);
-  const [isActiveFlood, setIsActiveFlood] = useState(false);
+  const [alertData, setAlertData] = useState<AlertMessage | null>(null);
   const [loading, setLoading] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,16 +52,11 @@ const Options = () => {
   });
 
   useEffect(() => {
-    setLoading(true);
-    chrome.storage.local.get(
-      ['userLocation', 'lastSentAlert', 'isActiveFlood'],
-      (result) => {
-        setUserLocation(result.userLocation ?? null);
-        setAlertData(result.lastSentAlert ?? null);
-        setIsActiveFlood(result.isActiveFlood ?? false);
-        setLoading(false);
-      },
-    );
+    chrome.storage.local.get(['userLocation', 'lastSentAlert'], (result) => {
+      setUserLocation(result.userLocation ?? null);
+      setAlertData(result.lastSentAlert ?? null);
+      setLoading(false);
+    });
 
     const handleStorageChange = (
       changes: { [key: string]: chrome.storage.StorageChange },
@@ -67,9 +69,6 @@ const Options = () => {
         if (changes.lastSentAlert) {
           setAlertData(changes.lastSentAlert.newValue ?? null);
         }
-        if (changes.isActiveFlood) {
-          setIsActiveFlood(changes.isActiveFlood.newValue ?? false);
-        }
       }
     };
 
@@ -81,62 +80,45 @@ const Options = () => {
   }, []);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log('Form data:', data);
     const location = await userAddress(data.address);
 
-    if (location) {
-      const newLocation: LatLngTuple = [location.latitude, location.longitude];
-      console.log(
-        `Latitude: ${location.latitude}, Longitude: ${location.longitude}`,
-      );
-      setUserLocation(newLocation);
-
-      chrome.storage.local.set({ userLocation: newLocation }, () => {
-        console.log('Location saved to Chrome storage');
-      });
-      form.reset({ address: '' });
-    } else {
-      console.log('Geocoding failed or no results found');
+    if (location.status !== 'found') {
+      form.setError('address', { message: lookupErrors[location.status] });
+      return;
     }
+
+    const newLocation: LatLngTuple = [location.latitude, location.longitude];
+    /* Setting the location here as well centres the map again when the same address is searched twice */
+    setUserLocation(newLocation);
+    chrome.storage.local.set({ userLocation: newLocation });
+    form.reset();
   };
 
   return (
     <div className="bg-gray-50">
-      <header className="flex justify-between items-center px-4 py-2 bg-white drop-shadow-xl w-full">
-        <div className="flex items-center w-full max-w-[1400px] mx-auto">
-          <div className="flex items-center justify-center">
-            <a
-              href="https://www.floodwatch.center"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Flood Watch's website">
-              <img
-                src={logoImage}
-                className="w-[200px] h-[100px] object-contain cursor-pointer"
-                alt="FloodWatch logo"
-              />
-            </a>
-          </div>
-
-          <ul className="flex items-center space-x-4 ml-auto">
-            <li className="cursor-pointer">
-              <a
-                href="https://www.floodwatch.center/contact-us"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Contact us link">
-                <Mail size={35} className="cursor-pointer" />
-              </a>
-            </li>
-          </ul>
-        </div>
+      {/* The logo's picture has a pixel of space under its letters, which the bottom padding leaves out */}
+      {/* The side padding keeps the logo clear of the website link, so a narrow window shrinks the logo instead */}
+      <header className="relative flex justify-center items-center px-14 pt-3 pb-[11px] bg-white border-b border-line w-full">
+        <img
+          src={logoImage}
+          className="w-[302px] h-[29px] object-contain"
+          alt="FloodWatch logo"
+        />
+        <a
+          href="https://erikm9.github.io/floodWatch/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="FloodWatch's website"
+          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-md text-black transition-colors duration-300 hover:text-alert motion-reduce:transition-none">
+          <House size={26} aria-hidden="true" />
+        </a>
       </header>
 
-      <div className="mt-16 flex flex-col px-4 pb-10 lg:flex-row justify-center items-start mx-4 lg:mx-auto max-w-[1400px] gap-8 bg-gray-50">
-        <div className="flex flex-col justify-start items-start gap-8 w-full">
+      <div className="mt-3 flex flex-col px-4 pb-2 lg:flex-row justify-center items-start gap-8 bg-gray-50">
+        <div className="flex flex-col justify-start items-start gap-2 w-full">
           <div className="w-full">
             {loading ? (
-              <div className="flex items-center justify-center h-[50vh] shadow-lg border rounded-lg px-4 py-4">
+              <div className="flex items-center justify-center h-[560px] border border-line rounded-lg px-4 py-4">
                 <BarLoader />
               </div>
             ) : (
@@ -144,28 +126,30 @@ const Options = () => {
             )}
           </div>
 
-          <div className="w-full flex flex-col items-center">
-            <div className="w-full">
+          {/* The form shrinks to its note's width, so the field and the button line up with the note */}
+          <div className="w-full flex flex-col items-start">
+            <div className="w-fit max-w-full">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8">
+                  className="space-y-1">
                   <FormField
                     control={form.control}
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-primaryFlood-dark text-lg font-medium">
-                          Location to monitor: service available only in England
-                          🏴󠁧󠁢󠁥󠁮󠁧󠁿
+                        <FormLabel className="text-primaryFlood-dark text-2xl font-medium">
+                          Location to monitor: the service is available only in
+                          England 🏴󠁧󠁢󠁥󠁮󠁧󠁿
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter a valid address within England"
+                            className="border-line"
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
+                        <FormDescription className="text-base">
                           Type in your address to see your location on the map!
                           We only support locations in England.
                         </FormDescription>
@@ -173,11 +157,11 @@ const Options = () => {
                       </FormItem>
                     )}
                   />
-                  <div className="flex justify-center lg:justify-start lg:items-start">
+                  <div className="flex justify-center">
                     <Button
                       type="submit"
-                      aria-label="button to show the user's location"
-                      className="mx-auto lg:mx-0">
+                      disabled={form.formState.isSubmitting}
+                      className="px-3 text-lg font-bold">
                       View my location
                     </Button>
                   </div>
@@ -187,15 +171,16 @@ const Options = () => {
           </div>
         </div>
 
-        {/* Right Section: Flood Report */}
-        <div className="w-full shadow-lg h-[50vh] border rounded-lg px-4 py-4">
-          <h2 className="text-xl font-bold mb-4 text-center">Flood Report</h2>
+        <div className="w-full h-[560px] border border-line rounded-lg px-4 py-4">
+          <h2 className="text-3xl font-bold mb-4 text-center text-primaryFlood">
+            Flood Report
+          </h2>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <BarLoader />
             </div>
-          ) : isActiveFlood && alertData ? (
-            <div className="space-y-3 text-sm overflow-y-auto h-[calc(50vh-5rem)] px-2">
+          ) : alertData ? (
+            <div className="space-y-3 text-base overflow-y-auto h-[calc(560px-5rem)] px-2">
               <p className="text-gray-600">
                 <strong>County:</strong> {alertData.county}
               </p>
@@ -217,9 +202,9 @@ const Options = () => {
                     )
                   : 'no information available'}
               </p>
-              <p className="text-center text-red-500 ">
+              <p className="text-center text-red-500">
                 Flood report issued by the{' '}
-                <span className="underline ">
+                <span className="underline">
                   <a
                     className="text-red-500 cursor-pointer"
                     href="https://www.gov.uk/government/organisations/environment-agency"
@@ -232,8 +217,8 @@ const Options = () => {
               </p>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-[calc(50vh-5rem)] px-2">
-              <p className="text-base text-center">
+            <div className="flex items-center justify-center h-[calc(560px-5rem)] px-2">
+              <p className="text-xl text-center">
                 Your area currently has no active alerts.
               </p>
             </div>

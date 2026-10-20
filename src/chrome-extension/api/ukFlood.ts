@@ -1,57 +1,58 @@
-import axios from 'axios';
+import { MultiPolygon, Polygon } from 'geojson';
 
-import {
-  ApiFloodWarning,
-  ApiPolygonData,
-  FloodResponse,
-  PolygonResponse,
-} from '@/types/api';
+import { FloodResponse, PolygonResponse } from '@/types/api';
+import { FloodWarning, PolygonData } from '@/types/types';
 
 const floodAPI = 'https://environment.data.gov.uk/flood-monitoring/id/floods';
-
-console.log('flood API', floodAPI);
 const polygonAPIBase =
   'https://environment.data.gov.uk/flood-monitoring/id/floodAreas';
 
-export async function fetchFloodWarnings(): Promise<ApiFloodWarning[]> {
-  try {
-    const response = await axios.get<FloodResponse>(floodAPI);
-    console.log('response from API', response);
-    const floods = response.data.items;
-    const floodWarnings: ApiFloodWarning[] = [];
-    console.log('flood warnings from the API', floodWarnings);
-    for (const flood of floods) {
-      const floodDetails: ApiFloodWarning = {
-        id: flood.floodAreaID,
-        description: flood.description,
-        county: flood.floodArea.county,
-        riverOrSea: flood.floodArea.riverOrSea,
-        severity: flood.severity,
-        severityLevel: flood.severityLevel,
-        message: flood.message,
-        timeMessageChanged: flood.timeMessageChanged,
-        polygonData: (await fetchPolygonData(flood.floodAreaID)) || [],
-      };
-      floodWarnings.push(floodDetails);
-    }
+/* Reuses the polygons already held for an area, since a flood area keeps its shape while its warning changes */
+export async function fetchFloodWarnings(
+  knownWarnings: FloodWarning[],
+): Promise<FloodWarning[]> {
+  const response = await fetch(floodAPI);
 
-    return floodWarnings;
-  } catch (error) {
-    console.error('Error fetching flood warnings:', error);
-    return [];
+  if (!response.ok) {
+    throw new Error(`Could not fetch flood warnings: ${response.status}`);
   }
+
+  const { items }: FloodResponse = await response.json();
+  const knownPolygons = new Map(
+    knownWarnings.map((warning) => [warning.id, warning.polygonData]),
+  );
+  const floodWarnings: FloodWarning[] = [];
+
+  for (const flood of items) {
+    const polygonData = knownPolygons.get(flood.floodAreaID);
+
+    floodWarnings.push({
+      id: flood.floodAreaID,
+      description: flood.description,
+      county: flood.floodArea.county,
+      riverOrSea: flood.floodArea.riverOrSea,
+      severity: flood.severity,
+      severityLevel: flood.severityLevel,
+      message: flood.message,
+      timeMessageChanged: flood.timeMessageChanged,
+      polygonData: polygonData?.length
+        ? polygonData
+        : await fetchPolygonData(flood.floodAreaID),
+    });
+  }
+
+  return floodWarnings;
 }
 
-export async function fetchPolygonData(
-  floodAreaID: string,
-): Promise<ApiPolygonData[]> {
-  const polygonEndpoint = `${polygonAPIBase}/${floodAreaID}/polygon`;
-
+async function fetchPolygonData(floodAreaID: string): Promise<PolygonData[]> {
   try {
-    const response = await axios.get<PolygonResponse>(polygonEndpoint);
-    const polygonData = response.data;
-    console.log('polygon end point:', polygonData);
-    return extractCoordinates(polygonData);
+    const response = await fetch(`${polygonAPIBase}/${floodAreaID}/polygon`);
+
+    if (!response.ok) {
+      throw new Error(`Could not fetch the polygon: ${response.status}`);
+    }
+
+    return extractCoordinates(await response.json());
   } catch (error) {
     console.error(
       `Error fetching polygon for flood area ${floodAreaID}:`,
@@ -61,23 +62,17 @@ export async function fetchPolygonData(
   }
 }
 
-export function extractCoordinates(
-  polygonData: PolygonResponse,
-): ApiPolygonData[] {
-  return polygonData.features.map((feature) => {
-    const geometryType = feature.geometry.type;
-
-    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
-      throw new Error(`Unexpected geometry type: ${geometryType}`);
-    }
-
-    return {
+/* Keeps the polygons of an outline and leaves out any other kind of shape */
+function extractCoordinates(polygonData: PolygonResponse): PolygonData[] {
+  return polygonData.features
+    .filter(
+      (feature) =>
+        feature.geometry.type === 'Polygon' ||
+        feature.geometry.type === 'MultiPolygon',
+    )
+    .map((feature) => ({
       area: feature.properties.AREA,
       description: feature.properties.DESCRIP,
-      geometry: {
-        type: geometryType,
-        coordinates: feature.geometry.coordinates,
-      },
-    };
-  });
+      geometry: feature.geometry as Polygon | MultiPolygon,
+    }));
 }

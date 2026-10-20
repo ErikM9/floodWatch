@@ -19,6 +19,7 @@ export interface FloodItem {
   severityLevel: number;
   timeMessageChanged: string;
   timeRaised: string;
+  timeSeverityChanged: string;
 }
 
 export interface FloodResponse {
@@ -55,53 +56,4 @@ export interface PolygonFeature {
 export interface PolygonResponse {
   type: string;
   features: PolygonFeature[];
-}
-
-export interface ApiFloodWarning {
-  id: string;
-  description: string;
-  county: string;
-  riverOrSea: string;
-  severity: string;
-  severityLevel: number;
-  message: string;
-  timeMessageChanged: string;
-  polygonData: ApiPolygonData[];
-}
-
-export interface ApiPolygonData {
-  area: string;
-  description: string;
-  geometry: {
-    type: 'Polygon' | 'MultiPolygon';
-    coordinates: number[][][] | number[][][][];
-  };
-}
-
-export interface ApiFloodResponse {
-  items: {
-    floodAreaID: string;
-    description: string;
-    floodArea: {
-      county: string;
-      riverOrSea: string;
-    };
-    severity: string;
-    severityLevel: number;
-    message: string;
-    timeMessageChanged: string;
-  }[];
-}
-
-export interface ApiPolygonResponse {
-  features: {
-    properties: {
-      AREA: string;
-      DESCRIP: string;
-    };
-    geometry: {
-      type: 'Polygon' | 'MultiPolygon';
-      coordinates: number[][][] | number[][][][];
-    };
-  }[];
 }

@@ -1,10 +1,8 @@
 {
-  "trailingComma": "none",
+  "trailingComma": "all",
   "tabWidth": 2,
-  "no-extra-semi": "off",
   "semi": true,
   "singleQuote": true,
   "bracketSameLine": true,
-  "trim_trailing_whitespace": true,
   "htmlWhitespaceSensitivity": "ignore"
 }

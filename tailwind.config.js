@@ -1,10 +1,10 @@
-/** @type {import('tailwindcss').Config} */
 import defaultTheme from 'tailwindcss/defaultTheme';
 import tailwindAnimate from 'tailwindcss-animate';
 
+/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: ['/popup-local.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       borderRadius: {
@@ -14,7 +14,6 @@ export default {
       },
       fontFamily: {
         sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
-        heading: ['"Kaisei Decol"', ...defaultTheme.fontFamily.serif],
       },
       colors: {
         primaryFlood: {
@@ -22,23 +21,8 @@ export default {
           DEFAULT: '#033E8C',
           light: '#3F76A6',
         },
-        alert: {
-          warning: '#FFBF00',
-          critical: '#D9534F',
-        },
-        neutral: {
-          light: '#F5F5F5',
-          ultra: '#FCFCFC',
-          dark: '#2D384C',
-          slate: '#274368',
-          small: '#004466',
-        },
-        success: '#25B32B',
-        interactive: '#2E5D9A',
-        accents: {
-          primary: '#FFAE00',
-          secondary: '#FFE100',
-        },
+        line: '#D3DDEA',
+        alert: '#218CED',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
